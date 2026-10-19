@@ -19,7 +19,7 @@ export default function AnimatedLogo({
   const WAVE_DURATION = 2.8;
 
   // Wave keyframes for the big HUM letters
-  const humWaveVariants = {
+  const humWaveVariants: any = {
     animate: (delay: number) => ({
       scale: [1, 1.15, 1],
       y: [0, -3.5, 0],
@@ -39,7 +39,7 @@ export default function AnimatedLogo({
   };
 
   // Wave keyframes for each letter in PROPERTIES
-  const propLetterVariants = {
+  const propLetterVariants: any = {
     animate: (delay: number) => ({
       scale: [1, 1.35, 1],
       y: [0, -1.5, 0],
