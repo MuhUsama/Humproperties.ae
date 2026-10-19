@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Lock, User, Eye, EyeOff, ShieldCheck, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
@@ -76,15 +77,22 @@ export default function AdminLoginPage() {
 
       <div className="relative z-10 w-full max-w-md">
         {/* Header Branding */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#d4af37]/20 to-black border border-[#d4af37]/40 shadow-[0_0_30px_rgba(212,175,55,0.2)] mb-4">
-            <ShieldCheck className="w-8 h-8 text-brand-gold" />
+        <div className="text-center mb-8 flex flex-col items-center">
+          <div className="relative w-56 h-24 mb-3">
+            <Image
+              src="/logo-hum-transparent.png"
+              alt="HUM Properties Logo"
+              fill
+              priority
+              sizes="224px"
+              className="object-contain"
+            />
           </div>
-          <h1 className="text-3xl font-serif font-bold text-white tracking-wide">
+          <h1 className="text-2xl font-serif font-bold text-white tracking-wide">
             Admin Portal
           </h1>
-          <p className="text-xs uppercase tracking-[0.25em] text-brand-gold/80 mt-1.5 font-medium">
-            Mohd. Alfalasi Real Estate
+          <p className="text-xs uppercase tracking-[0.25em] text-brand-gold/80 mt-1 font-medium">
+            HUM Properties
           </p>
         </div>
 

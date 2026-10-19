@@ -36,17 +36,15 @@ export default async function Footer() {
         {/* Brand */}
         <div>
           <div className="flex flex-col items-start mb-6">
-            <a href="/" aria-label="Mohd. Alfalasi Real Estate - Home">
+            <a href="/" aria-label="HUM Properties - Home">
               <AnimatedLogo
                 light
-                iconClassName="h-16 w-[3.15rem] sm:h-20 sm:w-16"
-                titleClassName="text-lg sm:text-xl"
-                subtitleClassName="text-[9px] sm:text-[10px]"
+                className="w-48 sm:w-56"
               />
             </a>
           </div>
           <p className="text-gray-400 max-w-sm leading-relaxed mb-6">
-            Discover exclusive luxury properties in Dubai. Your premier destination for real estate investments, buying, and renting top-tier properties.
+            Discover exclusive luxury properties in Dubai with HUM Properties. Your premier destination for real estate investments, buying, and renting top-tier properties.
           </p>
           
           {/* Social Media Links */}
@@ -145,7 +143,7 @@ export default async function Footer() {
       </div>
 
       <div className="w-full mx-auto px-6 lg:px-12 mt-16 pt-8 border-t border-[#222] text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} Mohd. Alfalasi Real Estate. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} HUM Properties. All rights reserved.</p>
       </div>
     </footer>
   );

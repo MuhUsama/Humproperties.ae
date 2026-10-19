@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -86,15 +87,24 @@ export default function AdminSidebar() {
         transition-transform duration-300 ease-in-out flex flex-col overflow-hidden
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}>
-        <div className="p-5 pb-2 shrink-0">
-          <a href="/" className="inline-block">
-            <h2 className="text-2xl font-serif font-bold text-white mb-1">
-              Admin Panel
-            </h2>
-            <p className="text-xs text-brand-gold font-medium uppercase tracking-widest">
-              Mohd. Alfalasi
-            </p>
-          </a>
+        <div className="p-5 pb-4 shrink-0 border-b border-white/10">
+          <Link href="/admin" className="flex flex-col gap-2 group">
+            <div className="relative h-12 w-44">
+              <Image
+                src="/logo-hum-transparent.png"
+                alt="HUM Properties Logo"
+                fill
+                priority
+                sizes="176px"
+                className="object-contain object-left group-hover:scale-105 transition-transform"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-gold">
+                Admin Panel
+              </span>
+            </div>
+          </Link>
         </div>
 
         <nav className="flex-1 px-4 py-3 space-y-1 overflow-y-auto min-h-0">

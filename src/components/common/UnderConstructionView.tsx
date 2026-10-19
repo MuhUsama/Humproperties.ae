@@ -54,12 +54,11 @@ export default function UnderConstructionView({ content }: UnderConstructionProp
           className="mb-6 sm:mb-8"
         >
           <Image
-            src="/logo.png"
-            alt="MFRE Logo"
-            width={240}
-            height={80}
-            className="w-auto h-16 sm:h-28 object-contain"
-            style={{ filter: "brightness(0) invert(1)" }}
+            src="/logo-hum-transparent.png"
+            alt="HUM Properties Logo"
+            width={280}
+            height={110}
+            className="w-auto h-20 sm:h-28 object-contain drop-shadow-md"
           />
         </motion.div>
 

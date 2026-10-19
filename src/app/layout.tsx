@@ -11,21 +11,21 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Mohd. Alfalasi Real Estate | Luxury Properties in Dubai",
-  description: "Discover exclusive luxury properties in Dubai with Mohd. Alfalasi Real Estate.",
-  metadataBase: new URL("https://mfreuae.com"),
+  title: "HUM Properties | Luxury Properties in Dubai",
+  description: "Discover exclusive luxury properties in Dubai with HUM Properties.",
+  metadataBase: new URL("https://humproperties.ae"),
   openGraph: {
-    title: "Mohd. Alfalasi Real Estate | Luxury Properties in Dubai",
-    description: "Discover exclusive luxury properties in Dubai with Mohd. Alfalasi Real Estate.",
-    url: "https://mfreuae.com",
-    siteName: "Mohd. Alfalasi Real Estate",
+    title: "HUM Properties | Luxury Properties in Dubai",
+    description: "Discover exclusive luxury properties in Dubai with HUM Properties.",
+    url: "https://humproperties.ae",
+    siteName: "HUM Properties",
     locale: "en_AE",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mohd. Alfalasi Real Estate | Luxury Properties in Dubai",
-    description: "Discover exclusive luxury properties in Dubai with Mohd. Alfalasi Real Estate.",
+    title: "HUM Properties | Luxury Properties in Dubai",
+    description: "Discover exclusive luxury properties in Dubai with HUM Properties.",
   },
 };
 
