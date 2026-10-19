@@ -1,0 +1,38 @@
+[
+  {
+    "id": "blog-1",
+    "title": "The Future of Luxury Real Estate in Dubai",
+    "slug": "future-of-luxury-real-estate",
+    "excerpt": "Discover how upcoming developments and architectural marvels are shaping the future of Dubai's ultra-luxury property market in 2026 and beyond.",
+    "content": "<p>Dubai continues to redefine the boundaries of luxury real estate. With ambitious new projects breaking ground, the skyline is evolving faster than ever. Investors from around the world are pouring into the emirate, seeking high-yield opportunities and unparalleled lifestyle amenities.</p><p>In this article, we explore the top 5 areas expected to see the highest appreciation over the next decade.</p>",
+    "image": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80",
+    "author": "Mohd. Alfalasi",
+    "published": true,
+    "createdAt": "2026-08-15T10:00:00.000Z",
+    "updatedAt": "2026-08-15T10:00:00.000Z"
+  },
+  {
+    "id": "blog-2",
+    "title": "Navigating Commercial Investments in the UAE",
+    "slug": "commercial-investments-uae",
+    "excerpt": "A comprehensive guide to understanding the commercial property landscape, zoning laws, and ROI expectations for businesses setting up in Dubai.",
+    "content": "<p>Commercial real estate in the UAE is booming, driven by pro-business regulations and a massive influx of international companies. Whether you are looking at retail spaces in Downtown Dubai or warehouses in Jebel Ali, understanding the specific zoning laws is critical.</p><p>We breakdown the average ROI across different commercial asset classes.</p>",
+    "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
+    "author": "Mohd. Alfalasi",
+    "published": true,
+    "createdAt": "2026-08-10T14:30:00.000Z",
+    "updatedAt": "2026-08-10T14:30:00.000Z"
+  },
+  {
+    "id": "blog-3",
+    "title": "Why Off-Plan Properties are the Smart Choice",
+    "slug": "why-off-plan-properties-smart-choice",
+    "excerpt": "Investing in off-plan properties offers flexible payment plans and significant capital appreciation. Learn the risks and rewards of this popular investment strategy.",
+    "content": "<p>Off-plan properties have always been a staple of the Dubai real estate market. Developers offer incredible incentives and flexible payment plans that make it easy to secure a high-value asset with minimal upfront capital.</p><p>Here is our step-by-step guide on how to safely invest in off-plan developments.</p>",
+    "image": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80",
+    "author": "Mohd. Alfalasi",
+    "published": true,
+    "createdAt": "2026-08-01T09:15:00.000Z",
+    "updatedAt": "2026-08-01T09:15:00.000Z"
+  }
+]

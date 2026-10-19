@@ -45,7 +45,6 @@ git-installer.exe
 
 # Local Data files (migrated to MongoDB)
 src/lib/database.json
-src/lib/blogs.json
 src/lib/contacts.json
 
 # Local Uploads
