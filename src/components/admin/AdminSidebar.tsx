@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import AnimatedLogo from "@/components/common/AnimatedLogo";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -89,16 +90,7 @@ export default function AdminSidebar() {
       `}>
         <div className="p-5 pb-4 shrink-0 border-b border-white/10">
           <Link href="/admin" className="flex flex-col gap-2 group">
-            <div className="relative h-12 w-44">
-              <Image
-                src="/logo-hum-transparent.png"
-                alt="HUM Properties Logo"
-                fill
-                priority
-                sizes="176px"
-                className="object-contain object-left group-hover:scale-105 transition-transform"
-              />
-            </div>
+            <AnimatedLogo light className="w-44" />
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-gold">
                 Admin Panel

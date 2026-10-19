@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import AnimatedLogo from "@/components/common/AnimatedLogo";
 import { useRouter } from "next/navigation";
 import { Lock, User, Eye, EyeOff, ShieldCheck, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
