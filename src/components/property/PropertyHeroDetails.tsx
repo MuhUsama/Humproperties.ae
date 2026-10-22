@@ -52,16 +52,16 @@ export default function PropertyHeroDetails(p: HeroOptionProps) {
       <TopBar onShare={p.onShare} copied={p.copied} />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-8 items-start">
         <div>
-          <button onClick={() => openZoom(activeIndex)} className="relative block w-full aspect-[16/10] rounded-3xl overflow-hidden group">
+          <button onClick={() => openZoom(activeIndex)} className="relative block w-full aspect-[16/10] lg:aspect-auto lg:h-[calc(100svh-19rem)] lg:min-h-[340px] rounded-3xl overflow-hidden group">
             <Image src={galleryImages[activeIndex]} alt={property.title} fill priority sizes="(max-width: 1024px) 100vw, 65vw" className="object-cover group-hover:scale-105 transition-transform duration-700" unoptimized={unopt(galleryImages[activeIndex])} />
             <span className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold">{activeIndex + 1} / {galleryImages.length}</span>
           </button>
-          <div className="grid grid-cols-5 gap-2 md:gap-3 mt-3">
+          <div className="flex gap-2 md:gap-3 mt-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {galleryImages.map((src, i) => (
               <button
                 key={i}
                 onClick={() => setActiveIndex(i)}
-                className={`relative aspect-[4/3] rounded-xl overflow-hidden border-2 transition-all ${i === activeIndex ? "border-brand-gold" : "border-transparent opacity-60 hover:opacity-100"}`}
+                className={`relative flex-shrink-0 w-[calc(20%-0.4rem)] md:w-[calc(20%-0.6rem)] aspect-[4/3] lg:aspect-auto lg:h-20 rounded-xl overflow-hidden border-2 transition-all ${i === activeIndex ? "border-brand-gold" : "border-transparent opacity-60 hover:opacity-100"}`}
               >
                 <Image src={src} alt="" fill sizes="20vw" className="object-cover" unoptimized={unopt(src)} />
               </button>
