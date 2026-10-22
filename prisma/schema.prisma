@@ -25,6 +25,13 @@ model Listing {
   features     String[] @default([])
   overview     String?
   directionLink String?
+  unitNo       String?
+  floor        String?
+  unitType     String?
+  subType      String?
+  view         String?
+  internalArea String?
+  externalArea String?
   specifications Json?
   amenities    Json?
   isVisible    Boolean  @default(true)
