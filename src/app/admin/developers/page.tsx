@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Trash2, Plus, UploadCloud, X, Pencil, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Loader2, Trash2, Plus, UploadCloud, X, Pencil, Eye, EyeOff, ExternalLink, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 
 type Developer = {
@@ -173,6 +173,29 @@ export default function DevelopersManagementPage() {
     }
   };
 
+  const [addingDefaults, setAddingDefaults] = useState(false);
+
+  const addDefaultDevelopers = async () => {
+    if (!confirm("Add the default off plan developers (Emaar, DAMAC, Meraas, Binghatti, Sobha, Nakheel and more)? Developers you already have are left as they are.")) return;
+
+    setAddingDefaults(true);
+    try {
+      const res = await fetch("/api/developers/defaults", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.added ? `Added ${data.added} developers` : "All default developers are already added");
+        await fetchDevelopers();
+      } else {
+        toast.error(data.error || "Failed to add default developers");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred");
+    } finally {
+      setAddingDefaults(false);
+    }
+  };
+
   const handleDelete = async (dev: Developer) => {
     if (!confirm(`Remove ${dev.name}? Their listings stay on the site but are no longer linked to a developer.`)) return;
 
@@ -202,6 +225,15 @@ export default function DevelopersManagementPage() {
             Developers shown on the public Off Plan page. Link listings to a developer by choosing the &quot;Off Plan&quot; status on a listing.
           </p>
         </div>
+        <div className="flex flex-wrap gap-2 flex-shrink-0">
+        <button
+          onClick={addDefaultDevelopers}
+          disabled={addingDefaults}
+          className="flex items-center justify-center gap-2 border border-gray-300 text-brand-black px-4 py-2 rounded-lg font-semibold hover:border-brand-black transition-colors"
+        >
+          {addingDefaults ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+          Add Default Developers
+        </button>
         <button
           onClick={() => (isFormOpen ? (setIsFormOpen(false), resetForm()) : openNew())}
           className="flex items-center justify-center gap-2 bg-brand-gold text-brand-black px-4 py-2 rounded-lg font-semibold hover:bg-brand-black hover:text-white transition-colors flex-shrink-0"
@@ -209,6 +241,7 @@ export default function DevelopersManagementPage() {
           {isFormOpen ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {isFormOpen ? "Cancel" : "Add Developer"}
         </button>
+        </div>
       </div>
 
       {isFormOpen && (
@@ -334,7 +367,7 @@ export default function DevelopersManagementPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {developers.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No developers yet. Add your first developer above.</div>
+          <div className="p-8 text-center text-gray-500">No developers yet. Click &quot;Add Default Developers&quot; to load the main Dubai and Abu Dhabi developers, or add your own above.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px]">
