@@ -142,7 +142,7 @@ export default function PropertyDetailsPage() {
   const propertyFaqs = getFaqsByCategory('property');
 
   return (
-    <main className="min-h-screen w-full flex flex-col bg-[#faf9f7] pt-32 selection:bg-brand-gold selection:text-white">
+    <main className="min-h-screen w-full flex flex-col bg-[#faf9f7] pt-24 md:pt-28 selection:bg-brand-gold selection:text-white">
       {/* Frame 1: Hero & Specs Overview */}
       <PropertyHero property={memoizedProperty} />
 
