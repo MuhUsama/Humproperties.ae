@@ -25,8 +25,6 @@ interface PropertyHeroProps {
 const PropertyHero = memo(function PropertyHero({ property }: PropertyHeroProps) {
   const [copied, setCopied] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [tiltX, setTiltX] = useState(0);
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
   
   const { formatPrice, formatArea } = useSettings();
 
@@ -76,43 +74,6 @@ const PropertyHero = memo(function PropertyHero({ property }: PropertyHeroProps)
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isZoomed, galleryImages.length]);
-
-  // Mobile Gyroscope Parallax Panoramic Pan (only on mobile devices <768px!)
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobileDevice(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (window.innerWidth >= 768) return;
-      if (e.gamma !== null && e.gamma !== undefined) {
-        // Clamp gamma between -45 and 45 degrees (left to right tilt)
-        const gamma = Math.max(-45, Math.min(45, e.gamma));
-        // Map -45..45 degrees to -35% .. 35% full horizontal sweep
-        const shiftPercent = (gamma / 45) * 35;
-        setTiltX(shiftPercent);
-      }
-    };
-
-    window.addEventListener("deviceorientation", handleOrientation, true);
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-      window.removeEventListener("deviceorientation", handleOrientation, true);
-    };
-  }, []);
-
-  // Touch move parallax fallback for mobile devices
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isMobileDevice) return;
-    const touch = e.touches[0];
-    const rect = e.currentTarget.getBoundingClientRect();
-    const touchX = (touch.clientX - rect.left) / rect.width;
-    // Multiplied by 70 to give a wide -35% to +35% full panoramic sweep
-    const shiftPercent = (0.5 - touchX) * 70;
-    setTiltX(Math.max(-35, Math.min(35, shiftPercent)));
-  };
 
   const openZoom = (index: number) => {
     setActiveIndex(index);
@@ -456,29 +417,18 @@ const PropertyHero = memo(function PropertyHero({ property }: PropertyHeroProps)
 
             {/* Main Zoomed Image Stage */}
             <div
-              className="relative flex-1 w-full max-w-[96vw] xl:max-w-[1800px] mx-auto my-2 sm:my-3 flex items-center justify-center overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-gray-950 shadow-2xl"
+              className="relative flex-1 min-h-0 w-full max-w-[96vw] xl:max-w-[1800px] mx-auto my-2 sm:my-3 flex items-center justify-center overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-gray-950 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeIndex}
-                  drag={true}
-                  dragConstraints={{ left: -700, right: 700, top: -120, bottom: 120 }}
-                  dragElastic={0.12}
-                  dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-                  initial={{ opacity: 0, scale: isMobileDevice ? 5 : 1.35 }}
-                  animate={{
-                    opacity: 1,
-                    scale: isMobileDevice ? 5 : 1.35,
-                    x: isMobileDevice ? `${tiltX}%` : "0%"
-                  }}
-                  exit={{ opacity: 0, scale: isMobileDevice ? 5 : 1.05 }}
-                  transition={{
-                    opacity: { duration: 0.3 },
-                    scale: { duration: 0.3 },
-                    x: { type: "spring", stiffness: 45, damping: 15 }
-                  }}
-                  className="relative w-full h-full min-h-[70svh] sm:min-h-[78svh] max-h-[85svh] flex items-center justify-center cursor-grab active:cursor-grabbing"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  // Whole photo always fits the stage (no zoom-in crop on desktop or mobile)
+                  className="absolute inset-0 flex items-center justify-center"
                 >
                   <Image
                     src={galleryImages[activeIndex]}
