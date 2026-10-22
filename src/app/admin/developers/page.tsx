@@ -253,7 +253,7 @@ export default function DevelopersManagementPage() {
                   />
                 </label>
               </div>
-              <p className="text-xs text-gray-400 mt-2">A transparent PNG or SVG looks best.</p>
+              <p className="text-xs text-gray-400 mt-2">A transparent PNG or SVG looks best. It is shown in white on the Off Plan page.</p>
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Cover Image (optional)</label>
@@ -288,7 +288,7 @@ export default function DevelopersManagementPage() {
                   />
                 </label>
               </div>
-              <p className="text-xs text-gray-400 mt-2">Shown as the banner on the developer&apos;s page.</p>
+              <p className="text-xs text-gray-400 mt-2">Background photo behind the logo on the Off Plan page, and the banner on the developer&apos;s page. A city or skyline shot works best.</p>
             </div>
           </div>
 

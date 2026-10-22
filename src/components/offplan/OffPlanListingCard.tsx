@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MapPin, Bed, Bath, Square } from "lucide-react";
+import { Bed, Bath, Square } from "lucide-react";
 import { useSettings } from "@/context/SettingsContext";
 
 export type OffPlanDeveloper = {
@@ -28,72 +28,42 @@ export default function OffPlanListingCard({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: Math.min(index, 6) * 0.08 }}
-      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full"
+      transition={{ delay: Math.min(index % 3, 2) * 0.08 }}
+      className="group bg-brand-black overflow-hidden flex flex-col h-full"
     >
       <Link href={`/properties/${property.id}`} className="block relative aspect-[4/3] overflow-hidden">
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
-          <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-brand-black text-xs font-bold rounded-full uppercase tracking-wider">
-            Off Plan
-          </span>
-          {property.category && (
-            <span className="px-3 py-1 bg-brand-gold/90 backdrop-blur-md text-white text-xs font-bold rounded-full uppercase tracking-wider">
-              {property.category}
-            </span>
-          )}
-        </div>
-        {developer?.logo && (
-          <div className="absolute bottom-4 right-4 z-10 h-10 max-w-[110px] bg-white/95 rounded-lg px-2 py-1.5 flex items-center shadow-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={developer.logo} alt={developer.name} className="max-h-full max-w-full object-contain" />
-          </div>
-        )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={property.image || "/placeholder-property.jpg"}
           alt={property.title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {developer?.logo && (
+          <div className="absolute top-4 left-4 h-9 max-w-[110px] bg-white/95 px-2 py-1.5 flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={developer.logo} alt={developer.name} className="max-h-full max-w-full object-contain" />
+          </div>
+        )}
       </Link>
 
-      <div className="p-6 flex flex-col flex-grow">
-        {developer && (
-          <Link
-            href={`/off-plan/${developer.slug}`}
-            className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gold mb-2 hover:underline w-fit"
-          >
-            {developer.name}
-          </Link>
-        )}
-        <h3 className="font-serif text-xl text-brand-black line-clamp-1 group-hover:text-brand-gold transition-colors mb-2">
-          <Link href={`/properties/${property.id}`}>{property.title}</Link>
-        </h3>
-
-        <div className="flex items-center text-gray-500 mb-4 text-sm">
-          <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-          <span className="truncate">{property.location}{property.city ? `, ${property.city}` : ""}</span>
-        </div>
-
-        <div className="mb-6">
-          <span className="block text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Starting from</span>
-          <span className="text-2xl font-bold text-brand-gold">{formatPrice(property.price)}</span>
-        </div>
-
-        <div className="flex items-center gap-4 text-sm text-gray-600 mt-auto pt-4 border-t border-gray-100">
-          <div className="flex items-center">
-            <Bed className="w-4 h-4 mr-1.5 opacity-70" />
-            <span>{property.beds}</span>
+      <div className="p-5 md:p-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 flex-grow">
+        <div className="min-w-0">
+          <h3 className="font-serif text-lg md:text-xl text-white line-clamp-2 mb-2">
+            <Link href={`/properties/${property.id}`}>{property.title}</Link>
+          </h3>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 mb-3 whitespace-nowrap">
+            <span className="flex items-center"><Bed className="w-3.5 h-3.5 mr-1.5" />{property.beds} Beds</span>
+            <span className="flex items-center"><Bath className="w-3.5 h-3.5 mr-1.5" />{property.baths} Baths</span>
+            <span className="flex items-center"><Square className="w-3.5 h-3.5 mr-1.5" />{formatArea(property.sqft)}</span>
           </div>
-          <div className="flex items-center">
-            <Bath className="w-4 h-4 mr-1.5 opacity-70" />
-            <span>{property.baths}</span>
-          </div>
-          <div className="flex items-center">
-            <Square className="w-4 h-4 mr-1.5 opacity-70" />
-            <span>{formatArea(property.sqft)}</span>
-          </div>
+          <div className="text-white text-lg font-semibold tracking-wide">{formatPrice(property.price)}</div>
         </div>
+        <Link
+          href={`/properties/${property.id}`}
+          className="flex-shrink-0 text-center border border-white/40 text-white text-xs font-semibold uppercase tracking-[0.15em] px-5 py-3 hover:bg-white hover:text-brand-black transition-colors"
+        >
+          See property
+        </Link>
       </div>
     </motion.div>
   );

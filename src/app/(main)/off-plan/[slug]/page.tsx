@@ -53,7 +53,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
           {developer.coverImage ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={developer.coverImage} alt={developer.name} className="absolute inset-0 w-full h-full object-cover z-0" />
+              <img src={developer.coverImage} alt={developer.name} className="absolute inset-0 w-full h-full object-cover grayscale z-0" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 z-0" />
             </>
           ) : (
@@ -79,7 +79,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
             </div>
             <div className="flex-1">
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d4af37]">Off Plan Developer</span>
-              <h1 className="text-4xl md:text-6xl font-serif text-white mt-2">{developer.name}</h1>
+              <h1 className="text-4xl md:text-7xl font-serif uppercase tracking-[0.15em] text-white mt-2">{developer.name}</h1>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 text-sm text-gray-300">
                 <span>{listings.length} {listings.length === 1 ? "Project" : "Projects"} Available</span>
                 {developer.website && (
@@ -122,7 +122,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {listings.map((prop, idx) => (
               <OffPlanListingCard key={prop.id} property={prop} developer={devSummary} index={idx} />
             ))}
