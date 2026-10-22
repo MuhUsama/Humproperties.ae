@@ -3,6 +3,7 @@ import Footer from "@/components/layout/Footer";
 import FloatingWhatsApp from "@/components/common/FloatingWhatsApp";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import UnderConstructionView from "@/components/common/UnderConstructionView";
+import IntroSplash from "@/components/common/IntroSplash";
 import AdminPreviewBanner from "@/components/common/AdminPreviewBanner";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
@@ -54,6 +55,7 @@ export default async function MainLayout({
 
   return (
     <>
+      <IntroSplash />
       {isUnderConstruction && isAdmin && <AdminPreviewBanner />}
       <ScrollToTop />
       <Navbar />

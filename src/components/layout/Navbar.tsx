@@ -223,6 +223,7 @@ export default function Navbar() {
           <a href="/" className="flex items-center space-x-2 w-full" onClick={() => setIsOpen(false)}>
             <div className="relative flex items-center h-20 sm:h-24 w-full transition-all duration-500">
               <AnimatedLogo
+                waitForIntro
                 light={scrolled || isOpen}
                 className={`transition-transform duration-500 origin-left ${scrolled && !isOpen ? 'scale-90' : 'scale-100'}`}
               />

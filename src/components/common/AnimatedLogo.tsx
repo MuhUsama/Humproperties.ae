@@ -1,12 +1,16 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, type Variants, useAnimationControls, useReducedMotion } from "framer-motion";
+import { INTRO_DONE_EVENT } from "@/components/common/IntroSplash";
 
 interface AnimatedLogoProps {
   /** true = displayed on dark backgrounds */
   light?: boolean;
   className?: string;
+  /** Hold the entrance wave until the brand intro hands over (header logo) */
+  waitForIntro?: boolean;
 }
 
 const PROPERTIES_LETTERS = ["P", "R", "O", "P", "E", "R", "T", "I", "E", "S"];
@@ -14,12 +18,46 @@ const PROPERTIES_LETTERS = ["P", "R", "O", "P", "E", "R", "T", "I", "E", "S"];
 export default function AnimatedLogo({
   light = false,
   className = "",
+  waitForIntro = false,
 }: AnimatedLogoProps) {
-  // Total cycle duration for the wave
+  // The wave plays once on arrival (and again on hover), then the logo rests static
   const WAVE_DURATION = 2.8;
+  const controls = useAnimationControls();
+  const reduceMotion = useReducedMotion();
+  const playing = useRef(false);
+
+  const playWave = useCallback(async () => {
+    if (reduceMotion || playing.current) return;
+    playing.current = true;
+    await controls.start("animate");
+    playing.current = false;
+  }, [controls, reduceMotion]);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    let timer: number | undefined;
+    const start = () => {
+      timer = window.setTimeout(playWave, waitForIntro ? 450 : 300);
+    };
+    if (!waitForIntro || (window as Window & { __humIntroDone?: boolean }).__humIntroDone) {
+      start();
+    } else {
+      window.addEventListener(INTRO_DONE_EVENT, start, { once: true });
+    }
+    return () => {
+      window.removeEventListener(INTRO_DONE_EVENT, start);
+      window.clearTimeout(timer);
+    };
+  }, [playWave, reduceMotion, waitForIntro]);
+
+  // Keep the resting PROPERTIES colour in sync when the navbar switches theme
+  useEffect(() => {
+    if (!playing.current) controls.set("rest");
+  }, [light, controls]);
 
   // Wave keyframes for the big HUM letters
-  const humWaveVariants: any = {
+  const humWaveVariants: Variants = {
+    rest: {},
     animate: (delay: number) => ({
       scale: [1, 1.15, 1],
       y: [0, -3.5, 0],
@@ -30,8 +68,6 @@ export default function AnimatedLogo({
       ],
       transition: {
         duration: 1.1,
-        repeat: Infinity,
-        repeatDelay: WAVE_DURATION - 1.1,
         delay: delay,
         ease: "easeInOut",
       },
@@ -39,7 +75,8 @@ export default function AnimatedLogo({
   };
 
   // Wave keyframes for each letter in PROPERTIES
-  const propLetterVariants: any = {
+  const propLetterVariants: Variants = {
+    rest: { color: light ? "#d4af37" : "#a37d24" },
     animate: (delay: number) => ({
       scale: [1, 1.35, 1],
       y: [0, -1.5, 0],
@@ -54,23 +91,34 @@ export default function AnimatedLogo({
       ],
       transition: {
         duration: 0.6,
-        repeat: Infinity,
-        repeatDelay: WAVE_DURATION - 0.6,
         delay: delay,
         ease: "easeInOut",
       },
     }),
   };
 
+  // Gold hairlines pulse once alongside the wave, then rest at full strength
+  const hairlineVariants: Variants = {
+    rest: { opacity: 1 },
+    animate: (delay: number) => ({
+      opacity: [1, 0.4, 1],
+      transition: { duration: WAVE_DURATION / 2, delay },
+    }),
+  };
+
   return (
-    <div className={`relative flex flex-col items-center select-none group ${className}`}>
+    <motion.div
+      className={`relative flex flex-col items-center select-none group ${className}`}
+      onHoverStart={playWave}
+    >
       {/* Top Row: H - U - M separated character by character waving left to right */}
       <div className="flex items-center justify-center gap-1 sm:gap-1.5 h-10 sm:h-12 md:h-14">
         {/* Letter H */}
         <motion.div
           custom={0.0}
           variants={humWaveVariants}
-          animate="animate"
+          initial="rest"
+          animate={controls}
           className="relative h-full aspect-[245/230] origin-bottom cursor-pointer"
         >
           <Image
@@ -87,7 +135,8 @@ export default function AnimatedLogo({
         <motion.div
           custom={0.22}
           variants={humWaveVariants}
-          animate="animate"
+          initial="rest"
+          animate={controls}
           className="relative h-full aspect-[240/230] origin-bottom cursor-pointer"
         >
           <Image
@@ -104,7 +153,8 @@ export default function AnimatedLogo({
         <motion.div
           custom={0.44}
           variants={humWaveVariants}
-          animate="animate"
+          initial="rest"
+          animate={controls}
           className="relative h-full aspect-[270/230] origin-bottom cursor-pointer"
         >
           <Image
@@ -123,8 +173,10 @@ export default function AnimatedLogo({
         {/* Left gold decorative hairline */}
         <motion.span
           className="h-[1px] w-4 sm:w-7 bg-gradient-to-r from-transparent to-[#d4af37]"
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: WAVE_DURATION, repeat: Infinity, delay: 0.6 }}
+          custom={0.6}
+          variants={hairlineVariants}
+          initial="rest"
+          animate={controls}
         />
 
         {/* Letter by letter waving from left to right */}
@@ -137,7 +189,8 @@ export default function AnimatedLogo({
                 key={index}
                 custom={charDelay}
                 variants={propLetterVariants}
-                animate="animate"
+                initial="rest"
+                animate={controls}
                 className="inline-block origin-center"
               >
                 {char}
@@ -149,16 +202,14 @@ export default function AnimatedLogo({
         {/* Right gold decorative hairline */}
         <motion.span
           className="h-[1px] w-4 sm:w-7 bg-gradient-to-l from-transparent to-[#d4af37]"
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{
-            duration: WAVE_DURATION,
-            repeat: Infinity,
-            delay: 0.65 + PROPERTIES_LETTERS.length * 0.08,
-          }}
+          custom={0.65 + PROPERTIES_LETTERS.length * 0.08}
+          variants={hairlineVariants}
+          initial="rest"
+          animate={controls}
         />
       </div>
 
       <span className="sr-only">HUM Properties</span>
-    </div>
+    </motion.div>
   );
 }
