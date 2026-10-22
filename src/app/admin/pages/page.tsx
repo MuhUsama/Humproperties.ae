@@ -160,7 +160,7 @@ const SITE_PAGES: SitePageConfig[] = [
   {
     slug: "buy_offplan",
     name: "Buy: Off Plan",
-    url: "#",
+    url: "/off-plan",
     group: "buy",
     category: "Buy Category",
     description: "Off plan project investments in Dubai (Header Item).",

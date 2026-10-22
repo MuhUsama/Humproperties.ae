@@ -166,6 +166,7 @@ export default function AllListingsPage() {
                   <option>All Statuses</option>
                   <option>For Sale</option>
                   <option>For Rent</option>
+                  <option>Off Plan</option>
                 </select>
                 <select 
                   value={visibilityFilter}
@@ -274,6 +275,8 @@ export default function AllListingsPage() {
                         <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full uppercase tracking-wider whitespace-nowrap ${
                           property.status?.toLowerCase() === 'for sale' 
                             ? "bg-blue-50 text-blue-700 border border-blue-100" 
+                            : property.status?.toLowerCase() === 'off plan'
+                            ? "bg-amber-50 text-amber-700 border border-amber-100"
                             : "bg-emerald-50 text-emerald-700 border border-emerald-100"
                         }`}>
                           {property.status}

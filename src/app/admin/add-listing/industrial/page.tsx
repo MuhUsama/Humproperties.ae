@@ -7,6 +7,7 @@ import { CustomSelect } from "@/components/ui/CustomSelect";
 import { UnitDetailsFields } from "@/components/admin/UnitDetailsFields";
 import { readUnitDetails, formatAedPrice } from "@/lib/unitDetails";
 import toast from "react-hot-toast";
+import DeveloperSelect from "@/components/admin/DeveloperSelect";
 
 export default function AddListingPage() {
   const [dragActive, setDragActive] = useState(false);
@@ -16,6 +17,7 @@ export default function AddListingPage() {
   // Dynamic Fields State
   const propertyType = "Industrial";
   const [status, setStatus] = useState("FOR SALE");
+  const [developerId, setDeveloperId] = useState("");
   const [category, setCategory] = useState("Jebel Ali");
   const [overview, setOverview] = useState("");
   const [specifications, setSpecifications] = useState([{ title: "", desc: "" }]);
@@ -142,6 +144,7 @@ export default function AddListingPage() {
         title,
         price: finalPrice,
         status,
+        developerId: status === "OFF PLAN" ? developerId || null : null,
         propertyType,
         category,
         city,
@@ -288,7 +291,7 @@ export default function AddListingPage() {
               <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
                 Status
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <label className="cursor-pointer">
                   <input type="radio" name="status" value="FOR SALE" className="peer sr-only" checked={status === "FOR SALE"} onChange={(e) => setStatus(e.target.value)} />
                   <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
@@ -301,8 +304,18 @@ export default function AddListingPage() {
                     FOR RENT
                   </div>
                 </label>
+                <label className="cursor-pointer">
+                  <input type="radio" name="status" value="OFF PLAN" className="peer sr-only" checked={status === "OFF PLAN"} onChange={(e) => setStatus(e.target.value)} />
+                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
+                    OFF PLAN
+                  </div>
+                </label>
               </div>
             </div>
+
+            {status === "OFF PLAN" && (
+              <DeveloperSelect value={developerId} onChange={setDeveloperId} />
+            )}
 
             <div className="space-y-2 md:col-span-1">
               <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">

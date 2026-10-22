@@ -39,6 +39,7 @@ export async function POST(request: Request) {
         sqft: String(body.sqft || "0"),
         image: body.image || "",
         status: body.status || "FOR SALE",
+        developerId: body.developerId || null,
         galleryImages: Array.isArray(body.galleryImages) ? body.galleryImages : [],
         description: body.description || null,
         features: Array.isArray(body.features) ? body.features : [],

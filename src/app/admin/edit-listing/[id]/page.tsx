@@ -7,6 +7,7 @@ import { addWatermarkAndCompress } from "@/lib/imageProcessor";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { UnitDetailsFields } from "@/components/admin/UnitDetailsFields";
 import { readUnitDetails, formatAedPrice } from "@/lib/unitDetails";
+import DeveloperSelect from "@/components/admin/DeveloperSelect";
 
 export default function EditListingPage() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export default function EditListingPage() {
   // Dynamic Fields State
   const [propertyType, setPropertyType] = useState("Residential");
   const [status, setStatus] = useState("FOR SALE");
+  const [developerId, setDeveloperId] = useState("");
   const [category, setCategory] = useState("Apartment");
   const [overview, setOverview] = useState("");
   const [specifications, setSpecifications] = useState<{ title: string, desc: string }[]>([]);
@@ -43,6 +45,7 @@ export default function EditListingPage() {
           
           if (data.data.propertyType) setPropertyType(data.data.propertyType);
           if (data.data.status) setStatus(data.data.status);
+          if (data.data.developerId) setDeveloperId(data.data.developerId);
           if (data.data.category) setCategory(data.data.category);
           if (data.data.overview) setOverview(data.data.overview);
           
@@ -194,6 +197,7 @@ export default function EditListingPage() {
         title,
         price: finalPrice,
         status,
+        developerId: status === "OFF PLAN" ? developerId || null : null,
         propertyType,
         category,
         city,
@@ -329,7 +333,7 @@ export default function EditListingPage() {
               <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
                 Status
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <label className="cursor-pointer">
                   <input type="radio" name="status" value="FOR SALE" className="peer sr-only" checked={status === "FOR SALE"} onChange={(e) => setStatus(e.target.value)} />
                   <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
@@ -342,8 +346,18 @@ export default function EditListingPage() {
                     FOR RENT
                   </div>
                 </label>
+                <label className="cursor-pointer">
+                  <input type="radio" name="status" value="OFF PLAN" className="peer sr-only" checked={status === "OFF PLAN"} onChange={(e) => setStatus(e.target.value)} />
+                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
+                    OFF PLAN
+                  </div>
+                </label>
               </div>
             </div>
+
+            {status === "OFF PLAN" && (
+              <DeveloperSelect value={developerId} onChange={setDeveloperId} />
+            )}
 
             <div className="space-y-2 md:col-span-1">
               <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
