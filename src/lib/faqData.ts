@@ -1,4 +1,4 @@
-export type FaqCategory = 'general' | 'buy' | 'sell' | 'rent' | 'invest' | 'property' | 'mortgage-services' | 'relocation-services' | 'property-management' | 'property-brokerage' | 'commercial-services' | 'industrial-services' | 'interior-design-and-fit-out' | 'real-estate-development';
+export type FaqCategory = 'general' | 'buy' | 'sell' | 'rent' | 'invest' | 'property' | 'mortgage-services' | 'relocation-services' | 'property-management' | 'property-brokerage' | 'commercial-services' | 'industrial-services' | 'interior-design-and-fit-out' | 'real-estate-development' | 'off-plan';
 
 export interface FaqItem {
   question: string;
@@ -761,6 +761,36 @@ export const faqData: FaqItem[] = [
     category: 'real-estate-development',
     question: "What happens during the handover phase?",
     answer: "We manage the critical handover phase, ensuring snagging is resolved, Building Completion Certificates (BCC) are secured, and the transition to Facility Management is seamless."
+  },
+  {
+    category: 'off-plan',
+    question: "What is an off plan property?",
+    answer: "An off plan property is bought directly from the developer before construction is complete. Buyers typically secure a lower entry price and pay in instalments during construction, with the balance due on or after handover."
+  },
+  {
+    category: 'off-plan',
+    question: "How do off plan payment plans work in Dubai?",
+    answer: "Most developers ask for a 10-20% down payment, followed by instalments linked to construction milestones. Many projects offer 60/40 or 50/50 splits, and some include post-handover plans that spread payments over several years after you receive the keys."
+  },
+  {
+    category: 'off-plan',
+    question: "Is my money protected when buying off plan?",
+    answer: "Yes. Every off plan project in Dubai must be registered with the Dubai Land Department (DLD) and RERA, and buyer payments go into a regulated escrow account that the developer can only draw from as construction progresses."
+  },
+  {
+    category: 'off-plan',
+    question: "What fees should I budget for besides the purchase price?",
+    answer: "Plan for the 4% DLD registration fee, an Oqood registration fee for off plan contracts, and agency fees where applicable. Service charges start once the building is handed over."
+  },
+  {
+    category: 'off-plan',
+    question: "Can foreigners buy off plan property in Dubai?",
+    answer: "Yes. Foreign nationals can buy freehold off plan property in designated areas such as Downtown Dubai, Dubai Hills Estate, Dubai Marina, Palm Jumeirah and Mohammed Bin Rashid City."
+  },
+  {
+    category: 'off-plan',
+    question: "How do I choose the right developer?",
+    answer: "Look at the developer's delivery history, handover record, build quality in completed communities and the long-term demand in the area. Our advisors can share track records and availability for each developer listed on this page."
   }
 ];
 

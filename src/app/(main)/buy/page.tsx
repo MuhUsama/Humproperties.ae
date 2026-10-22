@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { MapPin, Bed, Bath, Square, ExternalLink, ArrowLeft } from "lucide-react";
 import PropertyFilterBar, { FilterState } from "@/components/property/PropertyFilterBar";
 import { useSettings } from "@/context/SettingsContext";
+import { isBuyStatus } from "@/lib/listingStatus";
 import FaqSection from "@/components/common/FaqSection";
 import { getFaqsByCategory } from "@/lib/faqData";
 
@@ -75,7 +76,7 @@ function BuyContent() {
 
   // Calculate category counts dynamically
   const categoryCounts = properties.reduce((acc, p) => {
-    const isPurposeMatch = filters.purpose === "Buy" ? p.status?.toUpperCase().includes("SALE") : p.status?.toUpperCase().includes("RENT");
+    const isPurposeMatch = filters.purpose === "Buy" ? isBuyStatus(p.status) : p.status?.toUpperCase().includes("RENT");
     if (isPurposeMatch) {
       const cat = p.category;
       if (cat) {
@@ -109,7 +110,7 @@ function BuyContent() {
     // Purpose Filter (from PropertyFilterBar)
     const isBuy = filters.purpose === "Buy";
     const propStatus = prop.status?.toUpperCase() || "";
-    if (isBuy && !propStatus.includes("SALE")) return false;
+    if (isBuy && !isBuyStatus(propStatus)) return false;
     if (!isBuy && !propStatus.includes("RENT")) return false;
 
     // Search Filter
@@ -188,12 +189,12 @@ function BuyContent() {
         <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-6 border-b border-gray-100 pb-4">
           {["All", "Residential", "Commercial", "Industrial"].filter((type) => {
             if (type === "All") return totalInType > 0;
-            const count = properties.filter(p => (p.propertyType || "Residential") === type && (filters.purpose === "Buy" ? p.status?.toUpperCase().includes("SALE") : p.status?.toUpperCase().includes("RENT"))).length;
+            const count = properties.filter(p => (p.propertyType || "Residential") === type && (filters.purpose === "Buy" ? isBuyStatus(p.status) : p.status?.toUpperCase().includes("RENT"))).length;
             return count > 0;
           }).map((type) => {
             const count = type === "All" 
-              ? properties.filter(p => (filters.purpose === "Buy" ? p.status?.toUpperCase().includes("SALE") : p.status?.toUpperCase().includes("RENT"))).length 
-              : properties.filter(p => (p.propertyType || "Residential") === type && (filters.purpose === "Buy" ? p.status?.toUpperCase().includes("SALE") : p.status?.toUpperCase().includes("RENT"))).length;
+              ? properties.filter(p => (filters.purpose === "Buy" ? isBuyStatus(p.status) : p.status?.toUpperCase().includes("RENT"))).length 
+              : properties.filter(p => (p.propertyType || "Residential") === type && (filters.purpose === "Buy" ? isBuyStatus(p.status) : p.status?.toUpperCase().includes("RENT"))).length;
             
             return (
               <button
@@ -260,7 +261,7 @@ function BuyContent() {
           const availableCities = Array.from(
             new Set(
               properties
-                .filter(p => filters.purpose === "Buy" ? p.status?.toUpperCase().includes("SALE") : p.status?.toUpperCase().includes("RENT"))
+                .filter(p => filters.purpose === "Buy" ? isBuyStatus(p.status) : p.status?.toUpperCase().includes("RENT"))
                 .map(p => p.city || "Dubai")
                 .filter(Boolean)
             )

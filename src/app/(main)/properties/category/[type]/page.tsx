@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { MapPin, Bed, Bath, Square, ExternalLink, ArrowLeft } from "lucide-react";
 import PropertyFilterBar, { FilterState } from "@/components/property/PropertyFilterBar";
 import { useSettings } from "@/context/SettingsContext";
+import { isBuyStatus } from "@/lib/listingStatus";
 
 export default function PropertyCategoryPage({ params }: { params: Promise<{ type: string }> }) {
   const unwrappedParams = use(params);
@@ -86,7 +87,7 @@ export default function PropertyCategoryPage({ params }: { params: Promise<{ typ
             // Purpose Filter
             const isBuy = filters.purpose === "Buy";
             const propStatus = prop.status?.toUpperCase() || "";
-            if (isBuy && !propStatus.includes("SALE")) return false;
+            if (isBuy && !isBuyStatus(propStatus)) return false;
             if (!isBuy && !propStatus.includes("RENT")) return false;
 
             // Price Filter

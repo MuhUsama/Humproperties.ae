@@ -96,6 +96,7 @@ export async function PUT(request: Request, context: any) {
         sqft: body.sqft !== undefined ? String(body.sqft) : undefined,
         image: body.image,
         status: body.status,
+        developerId: body.developerId !== undefined ? body.developerId || null : undefined,
         galleryImages: Array.isArray(body.galleryImages) ? body.galleryImages : undefined,
         description: body.description,
         features: Array.isArray(body.features) ? body.features : undefined,
