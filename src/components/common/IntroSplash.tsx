@@ -23,10 +23,12 @@ const HEADER_IN_AFTER = 620;
 const CLEANUP_AFTER = 2400;
 const FLY_EASE = "cubic-bezier(0.72, 0, 0.16, 1)";
 
+// Explicit widths (image width / height) rather than aspect-ratio on flex items,
+// which iOS WebKit sizes wrongly and throws the lock-up off-centre
 const LETTERS = [
-  { src: "/hum-letter-h.png", aspect: "245/230" },
-  { src: "/hum-letter-u.png", aspect: "240/230" },
-  { src: "/hum-letter-m.png", aspect: "270/230" },
+  { src: "/hum-letter-h.png", ratio: 245 / 230 },
+  { src: "/hum-letter-u.png", ratio: 240 / 230 },
+  { src: "/hum-letter-m.png", ratio: 270 / 230 },
 ];
 
 export const INTRO_BOOT_SCRIPT = `(function(){try{var d=document.documentElement;
@@ -110,7 +112,7 @@ export default function IntroSplash() {
       <div className="hum-intro__lockup">
         <div ref={wordRef} className="hum-intro__word">
           {LETTERS.map((l) => (
-            <span key={l.src} className="hum-intro__letter" style={{ aspectRatio: l.aspect }}>
+            <span key={l.src} className="hum-intro__letter" style={{ width: `calc(var(--h) * ${l.ratio.toFixed(4)})` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={l.src} alt="" draggable={false} />
             </span>

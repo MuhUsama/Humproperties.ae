@@ -50,6 +50,7 @@ html.hum-intro-active { overflow: hidden; }
 
 .hum-intro__lockup {
   position: relative;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -68,11 +69,14 @@ html.hum-intro-active { overflow: hidden; }
 .hum-intro__letter {
   position: relative;
   display: block;
+  flex: none;
   height: 100%;
 }
 .hum-intro__letter img {
+  display: block;
   width: 100%;
   height: 100%;
+  max-width: none;
   object-fit: contain;
 }
 
