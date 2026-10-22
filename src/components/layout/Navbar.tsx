@@ -58,7 +58,7 @@ const subServices: SubPageItem[] = [
 ];
 
 const buyCategories: SubPageItem[] = [
-  { id: "buy_ready", title: "Ready", href: "#", isClickable: false },
+  { id: "buy_ready", title: "Ready", href: "/buy?status=ready" },
   { id: "buy_offplan", title: "Off Plan", href: "/off-plan" },
 ];
 
@@ -102,7 +102,7 @@ export default function Navbar() {
   const phone = siteInfo?.contact_phone || "+971 (04) 334 1131";
   const email = siteInfo?.contact_email || "info@mfreuae.com";
 
-  // Buy dropdown: Ready (non-clickable) and Off Plan (links to the developers page)
+  // Buy dropdown: Ready (ready properties) and Off Plan (developers page)
   const visibleBuyCategories = useMemo(() => {
     return buyCategories.filter((item) => !isPageHidden(item.id));
   }, [isPageHidden]);

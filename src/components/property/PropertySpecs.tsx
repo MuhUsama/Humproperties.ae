@@ -6,6 +6,7 @@ import { CheckCircle2 } from "lucide-react";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { useSettings } from "@/context/SettingsContext";
 import { UNIT_DETAIL_FIELDS, cleanUnitDetail } from "@/lib/unitDetails";
+import { isOffPlanStatus } from "@/lib/listingStatus";
 
 interface PropertySpecsProps {
   property: {
@@ -15,6 +16,7 @@ interface PropertySpecsProps {
     beds: number;
     baths: number;
     sqft: string;
+    status?: string;
     overview?: string;
     specifications?: { title: string; desc: string }[];
     amenities?: { title: string; desc: string }[];
@@ -132,7 +134,7 @@ const PropertySpecs = memo(function PropertySpecs({ property }: PropertySpecsPro
             </div>
             <div className="border-l-2 border-[#d4af37] pl-5 py-2">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Status</p>
-              <p className="text-2xl md:text-3xl font-serif text-[#101014]">Ready</p>
+              <p className="text-2xl md:text-3xl font-serif text-[#101014]">{isOffPlanStatus(property.status) ? "Off Plan" : "Ready"}</p>
             </div>
           </motion.div>
 

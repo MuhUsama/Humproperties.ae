@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { MapPin, Bed, Bath, Square, ExternalLink, ArrowLeft } from "lucide-react";
 import PropertyFilterBar, { FilterState } from "@/components/property/PropertyFilterBar";
 import { useSettings } from "@/context/SettingsContext";
-import { isBuyStatus } from "@/lib/listingStatus";
+import { isBuyStatus, isOffPlanStatus } from "@/lib/listingStatus";
 import FaqSection from "@/components/common/FaqSection";
 import { getFaqsByCategory } from "@/lib/faqData";
 
@@ -88,17 +88,20 @@ function BuyContent() {
 
   const totalInType = availableCategories.reduce((sum, cat) => sum + (categoryCounts[cat] || 0), 0);
 
+  // Buy > Ready links here with ?status=ready, which leaves off plan listings out
+  const readyOnly = searchParams.get("status") === "ready";
+
   useEffect(() => {
     fetch("/api/listings")
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setProperties(data.data);
+          setProperties(readyOnly ? data.data.filter((p: any) => !isOffPlanStatus(p.status)) : data.data);
         }
       })
       .catch((err) => console.error("Error fetching listings:", err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [readyOnly]);
 
   const fadeInUp: any = {
     hidden: { opacity: 0, y: 30 },

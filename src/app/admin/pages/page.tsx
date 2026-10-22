@@ -151,7 +151,7 @@ const SITE_PAGES: SitePageConfig[] = [
   {
     slug: "buy_ready",
     name: "Buy: Ready",
-    url: "#",
+    url: "/buy?status=ready",
     group: "buy",
     category: "Buy Category",
     description: "Ready properties for sale in Dubai (Header Item).",
