@@ -208,6 +208,7 @@ export default function Navbar() {
 
   return (
     <nav
+      data-hum-header
       className={`fixed top-0 w-full z-50 transition-all duration-500 border-none shadow-none ${
         isOpen 
           ? "bg-transparent py-2" // Transparent when menu is open so it blends
@@ -223,6 +224,7 @@ export default function Navbar() {
           <a href="/" className="flex items-center space-x-2 w-full" onClick={() => setIsOpen(false)}>
             <div className="relative flex items-center h-20 sm:h-24 w-full transition-all duration-500">
               <AnimatedLogo
+                introTarget
                 light={scrolled || isOpen}
                 className={`transition-transform duration-500 origin-left ${scrolled && !isOpen ? 'scale-90' : 'scale-100'}`}
               />
@@ -241,10 +243,8 @@ export default function Navbar() {
             return (
               <motion.div
                 key={item}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 * i }}
-                className="relative"
+                className="relative hum-intro-item"
+                style={{ "--i": i + 1 } as React.CSSProperties}
                 onMouseEnter={() => {
                   if (item === "Property Services") setIsServicesHovered(true);
                   if (item === "Buy") setIsBuyHovered(true);
@@ -438,7 +438,10 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Right CTA Button - flex-none ml-auto so it never stretches over center menu */}
-        <div className="hidden md:flex flex-none ml-auto justify-end items-center space-x-4 relative z-[60]">
+        <div
+          className="hidden md:flex flex-none ml-auto justify-end items-center space-x-4 relative z-[60] hum-intro-item"
+          style={{ "--i": navLinks.length + 2 } as React.CSSProperties}
+        >
           
           <div className="relative">
             <button
@@ -500,7 +503,10 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="flex-1 flex justify-end md:hidden relative z-[60]">
+        <div
+          className="flex-1 flex justify-end md:hidden relative z-[60] hum-intro-item"
+          style={{ "--i": 2 } as React.CSSProperties}
+        >
           <button 
             className={`w-10 h-10 flex flex-col justify-center items-center transition-colors ${
               isOpen ? "text-white" : scrolled ? "text-white" : "text-brand-black"

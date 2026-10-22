@@ -43,7 +43,7 @@ export default async function RootLayout({
   }, {} as Record<string, string>);
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preload" as="image" href="/hero_poster.jpg" fetchPriority="high" />
         <link rel="preload" as="video" href="/hero_section_video.webm" />
