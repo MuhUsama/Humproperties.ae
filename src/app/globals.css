@@ -19,8 +19,13 @@ nav, header {
 
 
 /* ───────────── Brand intro (IntroSplash.tsx) ─────────────
-   Timeline: letters rise 0.25–1.3s · lines + PROPERTIES 0.9–1.6s ·
-   sheen 1.45–2.2s · curtain lifts 2.3–3.2s. Keep in sync with the TS constants. */
+   Modelled on emaar.com: lock-up fades in (90–1290ms), gold rule grows
+   (990–1890ms), tagline rises (1290–2090ms); at 2350ms JS flies the word into
+   the header while the tagline falls and the header items fade in. */
+:root {
+  --hum-ease-soft: cubic-bezier(0.33, 0, 0.2, 1);
+}
+
 .hum-intro {
   position: fixed;
   inset: 0;
@@ -28,115 +33,104 @@ nav, header {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at center, #161616 0%, #0a0a0a 70%);
-  cursor: pointer;
-  animation: hum-intro-curtain 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.3s forwards;
-}
-.hum-intro--leaving {
-  animation: hum-intro-curtain 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  pointer-events: none;
 }
 html.hum-intro-skip .hum-intro { display: none; }
 html.hum-intro-active { overflow: hidden; }
 
-.hum-intro__inner {
+.hum-intro__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(11, 10, 18, 0.35), transparent 28% 58%, rgba(11, 10, 18, 0.55)),
+    rgba(10, 10, 10, 0.82);
+  transition: opacity 1.2s var(--hum-ease-soft);
+}
+.hum-intro--exit .hum-intro__veil { opacity: 0; }
+
+.hum-intro__lockup {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: hum-intro-recede 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.2s forwards;
-}
-.hum-intro--leaving .hum-intro__inner {
-  animation: hum-intro-recede 0.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
 
-.hum-intro__hum {
+.hum-intro__word {
+  --h: clamp(64px, 11vw, 128px);
   display: flex;
-  gap: clamp(6px, 1.2vw, 14px);
-  height: clamp(72px, 15vw, 150px);
+  gap: calc(var(--h) * 0.11);
+  height: var(--h);
+  transform-origin: 0 0;
+  opacity: 0.01;
+  animation: hum-intro-fade 1.2s var(--hum-ease-soft) 0.09s forwards;
+  will-change: transform, opacity;
 }
-.hum-intro__mask {
+.hum-intro__letter {
   position: relative;
   display: block;
   height: 100%;
-  overflow: hidden;
-}
-.hum-intro__letter {
-  position: absolute;
-  inset: 0;
-  transform: translateY(105%);
-  animation: hum-intro-rise 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .hum-intro__letter img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-.hum-intro__sheen {
-  position: absolute;
-  inset: 0;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 236, 170, 0.85) 48%,
-    rgba(212, 175, 55, 0.6) 52%,
-    transparent 70%
-  );
-  background-size: 300% 100%;
-  background-position: 100% 0;
-  mix-blend-mode: screen;
-  animation: hum-intro-sheen 0.8s ease-in-out forwards;
+
+.hum-intro__rule {
+  display: block;
+  height: 1px;
+  width: 0;
+  margin: clamp(14px, 2vw, 22px) 0 clamp(12px, 1.6vw, 18px);
+  background: #d4af37;
+  animation: hum-intro-rule-in 0.9s var(--hum-ease-soft) 0.99s forwards;
+}
+.hum-intro--exit .hum-intro__rule {
+  animation: hum-intro-rule-out 0.75s var(--hum-ease-soft) forwards;
 }
 
 .hum-intro__sub {
-  display: flex;
-  align-items: center;
-  gap: clamp(8px, 1.5vw, 16px);
-  margin-top: clamp(10px, 1.6vw, 18px);
-}
-.hum-intro__line {
-  height: 1px;
-  width: clamp(28px, 6vw, 64px);
-  transform: scaleX(0);
-  animation: hum-intro-draw 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
-}
-.hum-intro__line--left {
-  background: linear-gradient(to right, transparent, #d4af37);
-  transform-origin: right;
-}
-.hum-intro__line--right {
-  background: linear-gradient(to left, transparent, #d4af37);
-  transform-origin: left;
-}
-.hum-intro__word {
-  display: flex;
-  gap: clamp(4px, 0.8vw, 9px);
   font-family: var(--font-montserrat), sans-serif;
-  font-size: clamp(10px, 1.6vw, 16px);
+  font-size: clamp(10px, 1.1vw, 13px);
+  font-weight: 500;
   letter-spacing: 0.2em;
-  color: #d4af37;
-}
-.hum-intro__word span {
+  text-transform: uppercase;
+  color: #ffffff;
   opacity: 0;
-  transform: translateY(8px);
-  filter: blur(4px);
-  animation: hum-intro-letter 0.6s ease-out forwards;
+  transform: translateY(12px);
+  animation: hum-intro-sub-in 0.8s var(--hum-ease-soft) 1.29s forwards;
+}
+.hum-intro--exit .hum-intro__sub {
+  opacity: 1;
+  transform: none;
+  animation: hum-intro-sub-out 1.2s cubic-bezier(0.72, 0, 0.16, 1) forwards;
 }
 
-@keyframes hum-intro-rise { to { transform: translateY(0); } }
-@keyframes hum-intro-draw { to { transform: scaleX(1); } }
-@keyframes hum-intro-letter { to { opacity: 1; transform: none; filter: none; } }
-@keyframes hum-intro-sheen { to { background-position: 0 0; } }
-@keyframes hum-intro-recede {
-  to { opacity: 0; transform: translateY(-40px) scale(0.96); }
+@keyframes hum-intro-fade { to { opacity: 1; } }
+@keyframes hum-intro-rule-in { to { width: 72px; } }
+@keyframes hum-intro-rule-out { from { width: 72px; } to { width: 0; } }
+@keyframes hum-intro-sub-in { to { opacity: 1; transform: none; } }
+@keyframes hum-intro-sub-out {
+  78% { opacity: 1; }
+  to { opacity: 0; transform: translateY(52vh); }
 }
-@keyframes hum-intro-curtain {
-  to { transform: translateY(-100%); visibility: hidden; pointer-events: none; }
+
+/* Header waits hidden, then its items fade down into place (70ms stagger) */
+html.hum-intro-active:not(.hum-intro-header-in) nav[data-hum-header] {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
 }
+html.hum-intro-active .hum-intro-item {
+  opacity: 0;
+  translate: 0 -7px;
+}
+html.hum-intro-active.hum-intro-header-in .hum-intro-item {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 0.78s var(--hum-ease-soft) calc(var(--i, 0) * 70ms),
+    translate 0.78s var(--hum-ease-soft) calc(var(--i, 0) * 70ms);
+}
+html.hum-intro-active:not(.hum-intro-seated) #hum-header-mark { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .hum-intro { display: none; }

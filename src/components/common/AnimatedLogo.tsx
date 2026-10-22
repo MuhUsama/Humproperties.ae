@@ -3,14 +3,13 @@
 import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, type Variants, useAnimationControls, useReducedMotion } from "framer-motion";
-import { INTRO_DONE_EVENT } from "@/components/common/IntroSplash";
 
 interface AnimatedLogoProps {
   /** true = displayed on dark backgrounds */
   light?: boolean;
   className?: string;
-  /** Hold the entrance wave until the brand intro hands over (header logo) */
-  waitForIntro?: boolean;
+  /** Header logo: the brand intro flies into it, so it stays static (hover still waves) */
+  introTarget?: boolean;
 }
 
 const PROPERTIES_LETTERS = ["P", "R", "O", "P", "E", "R", "T", "I", "E", "S"];
@@ -18,7 +17,7 @@ const PROPERTIES_LETTERS = ["P", "R", "O", "P", "E", "R", "T", "I", "E", "S"];
 export default function AnimatedLogo({
   light = false,
   className = "",
-  waitForIntro = false,
+  introTarget = false,
 }: AnimatedLogoProps) {
   // The wave plays once on arrival (and again on hover), then the logo rests static
   const WAVE_DURATION = 2.8;
@@ -33,22 +32,12 @@ export default function AnimatedLogo({
     playing.current = false;
   }, [controls, reduceMotion]);
 
+  // Play the wave once on arrival; the header logo stays still after the intro
   useEffect(() => {
-    if (reduceMotion) return;
-    let timer: number | undefined;
-    const start = () => {
-      timer = window.setTimeout(playWave, waitForIntro ? 450 : 300);
-    };
-    if (!waitForIntro || (window as Window & { __humIntroDone?: boolean }).__humIntroDone) {
-      start();
-    } else {
-      window.addEventListener(INTRO_DONE_EVENT, start, { once: true });
-    }
-    return () => {
-      window.removeEventListener(INTRO_DONE_EVENT, start);
-      window.clearTimeout(timer);
-    };
-  }, [playWave, reduceMotion, waitForIntro]);
+    if (reduceMotion || introTarget) return;
+    const timer = window.setTimeout(playWave, 300);
+    return () => window.clearTimeout(timer);
+  }, [playWave, reduceMotion, introTarget]);
 
   // Keep the resting PROPERTIES colour in sync when the navbar switches theme
   useEffect(() => {
@@ -112,7 +101,10 @@ export default function AnimatedLogo({
       onHoverStart={playWave}
     >
       {/* Top Row: H - U - M separated character by character waving left to right */}
-      <div className="flex items-center justify-center gap-1 sm:gap-1.5 h-10 sm:h-12 md:h-14">
+      <div
+        id={introTarget ? "hum-header-mark" : undefined}
+        className="flex items-center justify-center gap-1 sm:gap-1.5 h-10 sm:h-12 md:h-14"
+      >
         {/* Letter H */}
         <motion.div
           custom={0.0}
@@ -169,7 +161,9 @@ export default function AnimatedLogo({
       </div>
 
       {/* Bottom Row: - P R O P E R T I E S - letter by letter left to right wave */}
-      <div className="flex items-center justify-center w-full mt-0.5 sm:mt-1 space-x-1 sm:space-x-1.5">
+      <div
+        className={`flex items-center justify-center w-full mt-0.5 sm:mt-1 space-x-1 sm:space-x-1.5 ${introTarget ? "hum-intro-item" : ""}`}
+      >
         {/* Left gold decorative hairline */}
         <motion.span
           className="h-[1px] w-4 sm:w-7 bg-gradient-to-r from-transparent to-[#d4af37]"

@@ -3,7 +3,7 @@ import Footer from "@/components/layout/Footer";
 import FloatingWhatsApp from "@/components/common/FloatingWhatsApp";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import UnderConstructionView from "@/components/common/UnderConstructionView";
-import IntroSplash from "@/components/common/IntroSplash";
+import IntroSplash, { INTRO_BOOT_SCRIPT } from "@/components/common/IntroSplash";
 import AdminPreviewBanner from "@/components/common/AdminPreviewBanner";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
@@ -55,6 +55,8 @@ export default async function MainLayout({
 
   return (
     <>
+      {/* Runs before the overlay and header paint: decides whether the intro plays */}
+      <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
       <IntroSplash />
       {isUnderConstruction && isAdmin && <AdminPreviewBanner />}
       <ScrollToTop />

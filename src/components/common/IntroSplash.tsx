@@ -1,26 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
- * Full-screen brand intro shown once per browser session (Emaar-style):
- * H, U, M rise through a mask, gold hairlines draw out, PROPERTIES settles in,
- * a gold sheen sweeps across HUM, then the curtain lifts to reveal the page.
+ * Brand intro shown once per browser session, modelled on emaar.com's:
+ * the HUM lock-up fades in centred over a dark veil, a gold rule grows and a
+ * tagline rises; then the HUM word flies up into the header logo's spot while
+ * the tagline falls away, the header items fade in and the real logo takes over.
  *
- * The overlay is server-rendered and driven purely by CSS (see globals.css),
- * so it starts on first paint without waiting for hydration and ends itself
- * even if JS fails. A tiny inline script in the root layout adds
- * `hum-intro-skip` to <html> on repeat visits so the overlay never paints.
+ * The inline script in INTRO_BOOT_SCRIPT (rendered by the (main) layout, before
+ * this overlay) decides before first paint whether the intro runs, so repeat
+ * visits and reduced-motion users never see it flash. The fade-in is CSS
+ * (globals.css, .hum-intro*); the flight is a measured transform set here.
  */
 
-export const INTRO_STORAGE_KEY = "hum-intro-seen";
-export const INTRO_DONE_EVENT = "hum:intro-done";
+const STORAGE_KEY = "hum-intro-seen";
 
-// Keep in sync with the timings in globals.css (.hum-intro*)
-const CURTAIN_START_MS = 2300;
-const TOTAL_MS = 3200;
-
-const PROPERTIES = "PROPERTIES".split("");
+// Timings (ms from first paint), taken from emaar.com's intro config
+const FLIGHT_AT = 2350;
+const FLIGHT_MS = 1200;
+const HEADER_IN_AFTER = 620;
+const CLEANUP_AFTER = 2400;
+const FLY_EASE = "cubic-bezier(0.72, 0, 0.16, 1)";
 
 const LETTERS = [
   { src: "/hum-letter-h.png", aspect: "245/230" },
@@ -28,103 +29,95 @@ const LETTERS = [
   { src: "/hum-letter-m.png", aspect: "270/230" },
 ];
 
-function signalDone() {
-  (window as Window & { __humIntroDone?: boolean }).__humIntroDone = true;
-  window.dispatchEvent(new Event(INTRO_DONE_EVENT));
-}
+export const INTRO_BOOT_SCRIPT = `(function(){try{var d=document.documentElement;
+if(sessionStorage.getItem('${STORAGE_KEY}')||matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('hum-intro-skip');return;}
+sessionStorage.setItem('${STORAGE_KEY}','1');d.classList.add('hum-intro-active');window.__humIntroT0=performance.now();
+setTimeout(function(){if(d.classList.contains('hum-intro-active')){d.classList.add('hum-intro-skip','hum-intro-header-in','hum-intro-seated');d.classList.remove('hum-intro-active');}},8000);
+}catch(e){document.documentElement.classList.add('hum-intro-skip');}})();`;
+
+type IntroWindow = Window & { __humIntroT0?: number };
 
 export default function IntroSplash() {
   const [mounted, setMounted] = useState(true);
-  const [leaving, setLeaving] = useState(false);
+  const wordRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const root = document.documentElement;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    // Already hidden by CSS in both cases; just hand over to the header logo
-    if (root.classList.contains("hum-intro-skip") || reduced) {
-      signalDone();
+    const html = document.documentElement;
+    if (!html.classList.contains("hum-intro-active")) {
+      setTimeout(() => setMounted(false), 0);
       return;
     }
 
-    try {
-      sessionStorage.setItem(INTRO_STORAGE_KEY, "1");
-    } catch {}
+    const timers: number[] = [];
+    const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, Math.max(0, ms)));
+    let finished = false;
 
-    root.classList.add("hum-intro-active");
-    const curtain = window.setTimeout(signalDone, CURTAIN_START_MS);
-    const remove = window.setTimeout(() => {
-      root.classList.remove("hum-intro-active");
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      timers.forEach(clearTimeout);
+      html.classList.add("hum-intro-header-in", "hum-intro-seated");
       setMounted(false);
-    }, TOTAL_MS);
+      later(() => html.classList.remove("hum-intro-active", "hum-intro-header-in", "hum-intro-seated"), 1600);
+      removeSkipListeners();
+    };
+
+    const fly = () => {
+      const word = wordRef.current;
+      const target = document.getElementById("hum-header-mark");
+      rootRef.current?.classList.add("hum-intro--exit");
+
+      if (word && target) {
+        const from = word.getBoundingClientRect();
+        const to = target.getBoundingClientRect();
+        const scale = to.height / from.height;
+        const dx = to.left + (to.width - from.width * scale) / 2 - from.left;
+        const dy = to.top - from.top;
+        word.style.transition = `transform ${FLIGHT_MS}ms ${FLY_EASE}`;
+        word.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+      }
+
+      later(() => html.classList.add("hum-intro-header-in"), HEADER_IN_AFTER);
+      later(() => {
+        html.classList.add("hum-intro-seated");
+        setMounted(false);
+        removeSkipListeners();
+      }, FLIGHT_MS);
+      later(() => html.classList.remove("hum-intro-active", "hum-intro-header-in", "hum-intro-seated"), CLEANUP_AFTER);
+    };
+
+    // Scroll, tap or a key press skips straight to the end, like Emaar's
+    const skipEvents = ["wheel", "touchmove", "keydown", "pointerdown"] as const;
+    const onSkip = () => finish();
+    const removeSkipListeners = () => skipEvents.forEach((e) => window.removeEventListener(e, onSkip));
+    skipEvents.forEach((e) => window.addEventListener(e, onSkip, { passive: true }));
+
+    const t0 = (window as IntroWindow).__humIntroT0 ?? performance.now();
+    later(fly, t0 + FLIGHT_AT - performance.now());
 
     return () => {
-      window.clearTimeout(curtain);
-      window.clearTimeout(remove);
-      root.classList.remove("hum-intro-active");
+      timers.forEach(clearTimeout);
+      removeSkipListeners();
     };
   }, []);
-
-  // Click / tap / key skips straight to the curtain lift
-  const skip = () => {
-    if (leaving) return;
-    setLeaving(true);
-    signalDone();
-    window.setTimeout(() => {
-      document.documentElement.classList.remove("hum-intro-active");
-      setMounted(false);
-    }, 800);
-  };
-
-  useEffect(() => {
-    if (!mounted) return;
-    const onKey = () => skip();
-    window.addEventListener("keydown", onKey, { once: true });
-    return () => window.removeEventListener("keydown", onKey);
-  });
 
   if (!mounted) return null;
 
   return (
-    <div
-      className={`hum-intro ${leaving ? "hum-intro--leaving" : ""}`}
-      onClick={skip}
-      aria-hidden="true"
-    >
-      <div className="hum-intro__inner">
-        <div className="hum-intro__hum">
-          {LETTERS.map((l, i) => (
-            <span key={l.src} className="hum-intro__mask" style={{ aspectRatio: l.aspect }}>
-              <span
-                className="hum-intro__letter"
-                style={{ animationDelay: `${0.25 + i * 0.16}s` }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={l.src} alt="" draggable={false} />
-                <span
-                  className="hum-intro__sheen"
-                  style={{
-                    WebkitMaskImage: `url(${l.src})`,
-                    maskImage: `url(${l.src})`,
-                    animationDelay: `${1.45 + i * 0.12}s`,
-                  }}
-                />
-              </span>
+    <div ref={rootRef} className="hum-intro" aria-hidden="true">
+      <div className="hum-intro__veil" />
+      <div className="hum-intro__lockup">
+        <div ref={wordRef} className="hum-intro__word">
+          {LETTERS.map((l) => (
+            <span key={l.src} className="hum-intro__letter" style={{ aspectRatio: l.aspect }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={l.src} alt="" draggable={false} />
             </span>
           ))}
         </div>
-
-        <div className="hum-intro__sub">
-          <span className="hum-intro__line hum-intro__line--left" />
-          <span className="hum-intro__word">
-            {PROPERTIES.map((c, i) => (
-              <span key={i} style={{ animationDelay: `${1.0 + i * 0.045}s` }}>
-                {c}
-              </span>
-            ))}
-          </span>
-          <span className="hum-intro__line hum-intro__line--right" />
-        </div>
+        <span className="hum-intro__rule" />
+        <span className="hum-intro__sub">Luxury Properties in Dubai</span>
       </div>
     </div>
   );

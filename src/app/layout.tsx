@@ -45,13 +45,6 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Skip the brand intro on repeat visits in this session, before first paint */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{if(sessionStorage.getItem('hum-intro-seen'))document.documentElement.classList.add('hum-intro-skip')}catch(e){}",
-          }}
-        />
         <link rel="preload" as="image" href="/hero_poster.jpg" fetchPriority="high" />
         <link rel="preload" as="video" href="/hero_section_video.webm" />
       </head>
