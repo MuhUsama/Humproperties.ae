@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { unitDetailsFromBody } from "@/lib/unitDetails";
 
 const prisma = new PrismaClient();
 
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
         features: Array.isArray(body.features) ? body.features : [],
         overview: body.overview || null,
         directionLink: body.directionLink || null,
+        ...unitDetailsFromBody(body),
         specifications: body.specifications || [],
         amenities: body.amenities || [],
         isVisible: body.isVisible !== undefined ? Boolean(body.isVisible) : true,

@@ -5,6 +5,8 @@ import { UploadCloud, CheckCircle2, Image as ImageIcon, Plus, Trash2 } from "luc
 import { useParams } from "next/navigation";
 import { addWatermarkAndCompress } from "@/lib/imageProcessor";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { UnitDetailsFields } from "@/components/admin/UnitDetailsFields";
+import { readUnitDetails, formatAedPrice } from "@/lib/unitDetails";
 import DeveloperSelect from "@/components/admin/DeveloperSelect";
 
 export default function EditListingPage() {
@@ -136,6 +138,7 @@ export default function EditListingPage() {
     const baths = parseInt((form.elements.namedItem("baths") as HTMLInputElement).value);
     const sqft = (form.elements.namedItem("sqft") as HTMLInputElement).value;
     const directionLink = (form.elements.namedItem("directionLink") as HTMLInputElement)?.value || "";
+    const unitDetails = readUnitDetails(form);
 
     // Enforce 5 images minimum rule
     const validGalleryFiles = galleryFiles.filter(item => item.file !== null || item.existingUrl !== undefined);
@@ -183,13 +186,7 @@ export default function EditListingPage() {
         }
       }
 
-      let finalPrice = price;
-      const numericPrice = price.replace(/[^\d]/g, "");
-      if (numericPrice) {
-        finalPrice = `AED ${Number(numericPrice).toLocaleString()}`;
-      } else if (!price.toUpperCase().startsWith("AED")) {
-        finalPrice = `AED ${price}`;
-      }
+      let finalPrice = formatAedPrice(price);
 
       // Add / Yearly for Rentals
       if (status === "FOR RENT" && !finalPrice.toLowerCase().includes("yearly")) {
@@ -209,6 +206,7 @@ export default function EditListingPage() {
         baths,
         sqft,
         directionLink,
+        ...unitDetails,
         image: finalImageUrl,
         overview,
         specifications: specifications.filter(s => s.title.trim() !== ""),
@@ -454,7 +452,7 @@ export default function EditListingPage() {
 
             <div className="space-y-2 md:col-span-2">
               <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
-                Square Footage
+                Total Area (sq.ft)
               </label>
               <input 
                 type="text" 
@@ -478,6 +476,10 @@ export default function EditListingPage() {
               />
             </div>
           </div>
+
+          <hr className="border-gray-100" />
+
+          <UnitDetailsFields defaults={initialData} />
 
           <hr className="border-gray-100" />
 

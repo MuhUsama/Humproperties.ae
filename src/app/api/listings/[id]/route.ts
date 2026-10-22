@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { v2 as cloudinary } from "cloudinary";
+import { unitDetailsFromBody } from "@/lib/unitDetails";
 
 const prisma = new PrismaClient();
 
@@ -100,6 +101,11 @@ export async function PUT(request: Request, context: any) {
         galleryImages: Array.isArray(body.galleryImages) ? body.galleryImages : undefined,
         description: body.description,
         features: Array.isArray(body.features) ? body.features : undefined,
+        overview: body.overview !== undefined ? body.overview || null : undefined,
+        directionLink: body.directionLink !== undefined ? body.directionLink || null : undefined,
+        specifications: Array.isArray(body.specifications) ? body.specifications : undefined,
+        amenities: Array.isArray(body.amenities) ? body.amenities : undefined,
+        ...unitDetailsFromBody(body, true),
         isVisible: body.isVisible !== undefined ? Boolean(body.isVisible) : undefined,
       }
     });
