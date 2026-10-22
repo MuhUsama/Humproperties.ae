@@ -4,6 +4,8 @@ import { useState } from "react";
 import { UploadCloud, CheckCircle2, Image as ImageIcon, Plus, Trash2 } from "lucide-react";
 import { addWatermarkAndCompress } from "@/lib/imageProcessor";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { UnitDetailsFields } from "@/components/admin/UnitDetailsFields";
+import { readUnitDetails, formatAedPrice } from "@/lib/unitDetails";
 import toast from "react-hot-toast";
 
 export default function AddListingPage() {
@@ -99,6 +101,7 @@ export default function AddListingPage() {
     const baths = parseInt((form.elements.namedItem("baths") as HTMLInputElement).value);
     const sqft = (form.elements.namedItem("sqft") as HTMLInputElement).value;
     const directionLink = (form.elements.namedItem("directionLink") as HTMLInputElement)?.value || "";
+    const unitDetails = readUnitDetails(form);
 
     setIsPublishing(true);
 
@@ -127,13 +130,7 @@ export default function AddListingPage() {
       }
 
       // Format price automatically
-      let finalPrice = price;
-      const numericPrice = price.replace(/[^\d]/g, "");
-      if (numericPrice) {
-        finalPrice = `AED ${Number(numericPrice).toLocaleString()}`;
-      } else if (!price.toUpperCase().startsWith("AED")) {
-        finalPrice = `AED ${price}`;
-      }
+      let finalPrice = formatAedPrice(price);
 
       // Add / Yearly for Rentals
       if (status === "FOR RENT" && !finalPrice.toLowerCase().includes("yearly")) {
@@ -153,6 +150,7 @@ export default function AddListingPage() {
         baths,
         sqft,
         directionLink,
+        ...unitDetails,
         image: uploadData.url,
         overview,
         specifications: specifications.filter(s => s.title.trim() !== ""),
@@ -392,7 +390,7 @@ export default function AddListingPage() {
 
             <div className="space-y-2 md:col-span-2">
               <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
-                Square Footage
+                Total Area (sq.ft)
               </label>
               <input 
                 type="text" 
@@ -415,6 +413,10 @@ export default function AddListingPage() {
               />
             </div>
           </div>
+
+          <hr className="border-gray-100" />
+
+          <UnitDetailsFields />
 
           <hr className="border-gray-100" />
 

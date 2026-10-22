@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { useSettings } from "@/context/SettingsContext";
+import { UNIT_DETAIL_FIELDS, cleanUnitDetail } from "@/lib/unitDetails";
 
 interface PropertySpecsProps {
   property: {
@@ -17,6 +18,13 @@ interface PropertySpecsProps {
     overview?: string;
     specifications?: { title: string; desc: string }[];
     amenities?: { title: string; desc: string }[];
+    unitNo?: string | null;
+    floor?: string | null;
+    unitType?: string | null;
+    subType?: string | null;
+    view?: string | null;
+    internalArea?: string | null;
+    externalArea?: string | null;
   };
 }
 
@@ -77,6 +85,13 @@ const detailedPrivileges = [
 const PropertySpecs = memo(function PropertySpecs({ property }: PropertySpecsProps) {
   const { formatArea } = useSettings();
   const specsToDisplay = property.specifications && property.specifications.length > 0 && property.specifications[0].title.trim() !== "" ? property.specifications : detailedSpecifications;
+  // Only unit details the admin actually filled in are shown
+  const unitDetails = UNIT_DETAIL_FIELDS.flatMap(({ key, label }) => {
+    const value = cleanUnitDetail(property[key]);
+    if (!value) return [];
+    const isArea = key === "internalArea" || key === "externalArea";
+    return [{ key, label: isArea ? label.replace(" (sq.ft)", "") : label, value: isArea ? formatArea(value) : value }];
+  });
   const amenitiesToDisplay = property.amenities && property.amenities.length > 0 && property.amenities[0].title.trim() !== "" ? property.amenities : detailedPrivileges;
 
   return (
@@ -120,6 +135,20 @@ const PropertySpecs = memo(function PropertySpecs({ property }: PropertySpecsPro
               <p className="text-2xl md:text-3xl font-serif text-[#101014]">Ready</p>
             </div>
           </motion.div>
+
+          {unitDetails.length > 0 && (
+            <motion.div variants={fadeInUp} className="mt-12">
+              <h3 className="text-xl md:text-2xl font-serif text-[#101014] mb-6">Unit Details</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {unitDetails.map((item) => (
+                  <div key={item.key} className="border-l-2 border-[#d4af37] pl-5 py-2">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">{item.label}</p>
+                    <p className="text-lg md:text-xl font-serif text-[#101014] break-words">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Features Section */}
