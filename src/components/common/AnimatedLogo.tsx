@@ -6,7 +6,24 @@ interface AnimatedLogoProps {
   className?: string;
   /** Header logo: the brand intro (IntroSplash) flies into its HUM row */
   introTarget?: boolean;
+  /** "compact" is the smaller header size */
+  size?: "default" | "compact";
 }
+
+const SIZES = {
+  default: {
+    row: "gap-1 sm:gap-1.5 h-10 sm:h-12 md:h-14",
+    sub: "mt-0.5 sm:mt-1 space-x-1 sm:space-x-1.5",
+    line: "w-4 sm:w-7",
+    text: "space-x-[2px] sm:space-x-[3px] tracking-[0.25em] sm:tracking-[0.3em] text-[9px] sm:text-[11px] md:text-[12px]",
+  },
+  compact: {
+    row: "gap-[3px] sm:gap-1 h-8 sm:h-9 md:h-10",
+    sub: "mt-0.5 space-x-1",
+    line: "w-3 sm:w-5",
+    text: "space-x-[1px] sm:space-x-[2px] tracking-[0.25em] sm:tracking-[0.3em] text-[7px] sm:text-[8px] md:text-[9px]",
+  },
+};
 
 const PROPERTIES_LETTERS = ["P", "R", "O", "P", "E", "R", "T", "I", "E", "S"];
 
@@ -24,13 +41,15 @@ export default function AnimatedLogo({
   light = false,
   className = "",
   introTarget = false,
+  size = "default",
 }: AnimatedLogoProps) {
+  const sz = SIZES[size];
   return (
     <div className={`relative flex flex-col items-center select-none ${className}`}>
       {/* Top Row: H U M */}
       <div
         id={introTarget ? "hum-header-mark" : undefined}
-        className="flex items-center justify-center gap-1 sm:gap-1.5 h-10 sm:h-12 md:h-14"
+        className={`flex items-center justify-center ${sz.row}`}
       >
         {HUM_LETTERS.map((l) => (
           <div key={l.src} className={`relative h-full ${l.aspect}`}>
@@ -41,11 +60,11 @@ export default function AnimatedLogo({
 
       {/* Bottom Row: - P R O P E R T I E S - */}
       <div
-        className={`flex items-center justify-center w-full mt-0.5 sm:mt-1 space-x-1 sm:space-x-1.5 ${introTarget ? "hum-intro-item" : ""}`}
+        className={`flex items-center justify-center w-full ${sz.sub} ${introTarget ? "hum-intro-item" : ""}`}
       >
-        <span className="h-[1px] w-4 sm:w-7 bg-gradient-to-r from-transparent to-[#d4af37]" />
+        <span className={`h-[1px] ${sz.line} bg-gradient-to-r from-transparent to-[#d4af37]`} />
         <div
-          className={`flex items-center space-x-[2px] sm:space-x-[3px] font-sans tracking-[0.25em] sm:tracking-[0.3em] text-[9px] sm:text-[11px] md:text-[12px] uppercase transition-colors duration-500 ${
+          className={`flex items-center font-sans uppercase transition-colors duration-500 ${sz.text} ${
             light ? "text-[#d4af37]" : "text-[#a37d24]"
           }`}
         >
@@ -55,7 +74,7 @@ export default function AnimatedLogo({
             </span>
           ))}
         </div>
-        <span className="h-[1px] w-4 sm:w-7 bg-gradient-to-l from-transparent to-[#d4af37]" />
+        <span className={`h-[1px] ${sz.line} bg-gradient-to-l from-transparent to-[#d4af37]`} />
       </div>
 
       <span className="sr-only">HUM Properties</span>
