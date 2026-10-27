@@ -56,15 +56,22 @@ html.hum-intro-active { overflow: hidden; }
   align-items: center;
 }
 
-.hum-intro__word {
+/* The whole HUM + PROPERTIES mark flies into the header logo */
+.hum-intro__mark {
   --h: clamp(64px, 11vw, 128px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.hum-intro__word {
   display: flex;
   gap: calc(var(--h) * 0.11);
   height: var(--h);
-  transform-origin: 0 0;
   opacity: 0.01;
   animation: hum-intro-fade 1.2s var(--hum-ease-soft) 0.09s forwards;
-  will-change: transform, opacity;
 }
 .hum-intro__letter {
   position: relative;
@@ -80,43 +87,46 @@ html.hum-intro-active { overflow: hidden; }
   object-fit: contain;
 }
 
-.hum-intro__rule {
+/* "— PROPERTIES —", in the header logo's proportions (sizes relative to --h) */
+.hum-intro__sub {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--h) * 0.107);
+  margin-top: calc(var(--h) * 0.07);
+  color: #d4af37;
+  transition: color 1.2s var(--hum-ease-soft);
+}
+.hum-intro--exit .hum-intro__sub { color: #a37d24; }
+.hum-intro__line {
   display: block;
   height: 1px;
-  width: 0;
-  margin: clamp(14px, 2vw, 22px) 0 clamp(12px, 1.6vw, 18px);
-  background: #d4af37;
-  animation: hum-intro-rule-in 0.9s var(--hum-ease-soft) 0.99s forwards;
+  width: calc(var(--h) * 0.5);
+  transform: scaleX(0);
+  animation: hum-intro-line-in 0.9s var(--hum-ease-soft) 0.99s forwards;
 }
-.hum-intro--exit .hum-intro__rule {
-  animation: hum-intro-rule-out 0.75s var(--hum-ease-soft) forwards;
+.hum-intro__line--left {
+  background: linear-gradient(to right, transparent, #d4af37);
+  transform-origin: right;
 }
-
-.hum-intro__sub {
+.hum-intro__line--right {
+  background: linear-gradient(to left, transparent, #d4af37);
+  transform-origin: left;
+}
+.hum-intro__properties {
+  display: flex;
+  gap: calc(var(--h) * 0.054);
   font-family: var(--font-montserrat), sans-serif;
-  font-size: clamp(10px, 1.1vw, 13px);
-  font-weight: 500;
-  letter-spacing: 0.2em;
+  font-size: calc(var(--h) * 0.214);
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: #ffffff;
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(calc(var(--h) * 0.12));
   animation: hum-intro-sub-in 0.8s var(--hum-ease-soft) 1.29s forwards;
-}
-.hum-intro--exit .hum-intro__sub {
-  opacity: 1;
-  transform: none;
-  animation: hum-intro-sub-out 1.2s cubic-bezier(0.72, 0, 0.16, 1) forwards;
 }
 
 @keyframes hum-intro-fade { to { opacity: 1; } }
-@keyframes hum-intro-rule-in { to { width: 72px; } }
-@keyframes hum-intro-rule-out { from { width: 72px; } to { width: 0; } }
+@keyframes hum-intro-line-in { to { transform: scaleX(1); } }
 @keyframes hum-intro-sub-in { to { opacity: 1; transform: none; } }
-@keyframes hum-intro-sub-out {
-  78% { opacity: 1; }
-  to { opacity: 0; transform: translateY(52vh); }
-}
 
 /* Header waits hidden, then its items fade down into place (70ms stagger) */
 html.hum-intro-active:not(.hum-intro-header-in) nav[data-hum-header] {
@@ -135,6 +145,10 @@ html.hum-intro-active.hum-intro-header-in .hum-intro-item {
     translate 0.78s var(--hum-ease-soft) calc(var(--i, 0) * 70ms);
 }
 html.hum-intro-active:not(.hum-intro-seated) #hum-header-mark { opacity: 0; }
+/* The header's PROPERTIES row arrives with the flying mark, so it swaps in
+   with HUM instead of fading in with the menu items */
+html.hum-intro-active #hum-header-mark + div { transition: none !important; }
+html.hum-intro-active:not(.hum-intro-seated) #hum-header-mark + div { opacity: 0 !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .hum-intro { display: none; }
