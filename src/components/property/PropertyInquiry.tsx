@@ -153,7 +153,7 @@ const PropertyInquiry = memo(function PropertyInquiry({ property }: PropertyInqu
   return (
     <section
       id="consultation-desk"
-      className="relative w-full min-h-[calc(100svh-5rem)] flex items-center justify-center px-3 py-3 sm:px-6 sm:py-6 lg:px-10 scroll-mt-20 overflow-hidden"
+      className="relative w-full min-h-[calc(100svh-5rem)] flex items-center justify-center px-4 sm:px-6 lg:px-12 py-3 sm:py-6 scroll-mt-20 overflow-hidden"
     >
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#d4af37]/8 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-10 w-[400px] h-[400px] bg-[#d4af37]/10 rounded-full blur-[120px] pointer-events-none"></div>
@@ -163,7 +163,7 @@ const PropertyInquiry = memo(function PropertyInquiry({ property }: PropertyInqu
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.15 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-3xl lg:max-w-6xl 2xl:max-w-7xl bg-white text-[#101014] rounded-[1.5rem] sm:rounded-[2rem] border border-[#d4af37]/30 shadow-[0_20px_70px_rgba(0,0,0,0.06)] overflow-hidden lg:grid lg:grid-cols-12 lg:min-h-[70svh]"
+        className="relative z-10 w-full bg-white text-[#101014] rounded-3xl border border-[#d4af37]/30 shadow-[0_20px_70px_rgba(0,0,0,0.06)] overflow-hidden lg:grid lg:grid-cols-12 lg:min-h-[70svh]"
       >
         {/* Featured photo: banner on tablets, side panel on desktop (phones show the compact card below) */}
         <div className="hidden md:flex relative flex-col justify-end overflow-hidden text-white bg-[#101014] h-60 p-6 lg:h-auto lg:col-span-5 lg:p-8 xl:p-10 [@media(max-height:860px)]:lg:p-7">
