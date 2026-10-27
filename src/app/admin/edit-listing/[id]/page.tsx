@@ -471,7 +471,7 @@ export default function EditListingPage() {
                 type="url" 
                 name="directionLink"
                 defaultValue={initialData.directionLink}
-                placeholder="e.g. https://maps.google.com/?q=..." 
+                placeholder="Paste the Google Maps link of the exact building (Share → Copy link)" 
                 className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all placeholder:text-gray-400 font-medium"
               />
             </div>
