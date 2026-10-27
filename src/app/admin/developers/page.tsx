@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Loader2, Trash2, Plus, UploadCloud, X, Pencil, Eye, EyeOff, ExternalLink, Sparkles } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Loader2, Trash2, Plus, UploadCloud, X, Pencil, Eye, EyeOff, ExternalLink, Sparkles, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 
 type Developer = {
@@ -39,6 +39,10 @@ export default function DevelopersManagementPage() {
   const [logoPreview, setLogoPreview] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState("");
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const orderBeforeDrag = useRef<Developer[] | null>(null);
 
   useEffect(() => {
     fetchDevelopers();
@@ -78,6 +82,8 @@ export default function DevelopersManagementPage() {
 
   const openNew = () => {
     resetForm();
+    // New developers go to the end of the list
+    setFormData({ ...emptyForm, order: developers.reduce((max, d) => Math.max(max, (d.order || 0) + 1), 0) });
     setIsFormOpen(true);
   };
 
@@ -170,6 +176,65 @@ export default function DevelopersManagementPage() {
     } catch (error) {
       console.error(error);
       toast.error("An error occurred");
+    }
+  };
+
+  // Saves the list order; position in the list becomes each developer's display order
+  const saveOrder = async (next: Developer[], previous: Developer[]) => {
+    setDevelopers(next.map((d, i) => ({ ...d, order: i })));
+    setSavingOrder(true);
+    try {
+      const res = await fetch("/api/developers/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: next.map((d) => d.id) }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Order saved");
+      } else {
+        setDevelopers(previous);
+        toast.error(data.error || "Failed to save the new order");
+      }
+    } catch (error) {
+      console.error(error);
+      setDevelopers(previous);
+      toast.error("An error occurred");
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
+  const moveDeveloper = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= developers.length) return;
+    const next = [...developers];
+    [next[index], next[target]] = [next[target], next[index]];
+    saveOrder(next, developers);
+  };
+
+  const handleDragOver = (e: React.DragEvent, overId: string) => {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setDragOverId(overId);
+    setDevelopers((prev) => {
+      const from = prev.findIndex((d) => d.id === dragId);
+      const to = prev.findIndex((d) => d.id === overId);
+      if (from === -1 || to === -1) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
+  const handleDragEnd = () => {
+    const previous = orderBeforeDrag.current;
+    orderBeforeDrag.current = null;
+    setDragId(null);
+    setDragOverId(null);
+    if (previous && previous.some((d, i) => d.id !== developers[i]?.id)) {
+      saveOrder(developers, previous);
     }
   };
 
@@ -336,14 +401,10 @@ export default function DevelopersManagementPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Page URL Slug</label>
               <input type="text" className="w-full border border-gray-200 rounded-lg p-3" value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value })} placeholder="Generated from the name" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Display Order</label>
-              <input type="number" className="w-full border border-gray-200 rounded-lg p-3" value={formData.order} onChange={e => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })} />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Visibility</label>
@@ -365,14 +426,22 @@ export default function DevelopersManagementPage() {
         </form>
       )}
 
+      {developers.length > 1 && (
+        <p className="text-sm text-gray-500 mb-3 flex items-center gap-2">
+          {savingOrder ? <Loader2 className="w-4 h-4 animate-spin" /> : <GripVertical className="w-4 h-4" />}
+          {savingOrder ? "Saving order..." : "Drag a row, or use the arrows, to change the order developers appear on the Off Plan page."}
+        </p>
+      )}
+
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {developers.length === 0 ? (
           <div className="p-8 text-center text-gray-500">No developers yet. Click &quot;Add Default Developers&quot; to load the main Dubai and Abu Dhabi developers, or add your own above.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px]">
+            <table className="w-full min-w-[740px]">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
+                  <th className="pl-4 pr-2 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-24">Order</th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Developer</th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Projects</th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
@@ -380,8 +449,46 @@ export default function DevelopersManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {developers.map(dev => (
-                  <tr key={dev.id} className="hover:bg-gray-50/50">
+                {developers.map((dev, index) => (
+                  <tr
+                    key={dev.id}
+                    draggable={!savingOrder}
+                    onDragStart={(e) => {
+                      orderBeforeDrag.current = developers;
+                      setDragId(dev.id);
+                      e.dataTransfer.effectAllowed = "move";
+                    }}
+                    onDragOver={(e) => handleDragOver(e, dev.id)}
+                    onDrop={(e) => e.preventDefault()}
+                    onDragEnd={handleDragEnd}
+                    className={`transition-colors ${dragId === dev.id ? "bg-brand-gold/10 opacity-60" : dragOverId === dev.id ? "bg-gray-50" : "hover:bg-gray-50/50"}`}
+                  >
+                    <td className="pl-4 pr-2 py-4">
+                      <div className="flex items-center gap-1">
+                        <span title="Drag to reorder" className="p-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing">
+                          <GripVertical className="w-5 h-5" />
+                        </span>
+                        <span className="w-5 text-center text-sm font-bold text-gray-500">{index + 1}</span>
+                        <div className="flex flex-col">
+                          <button
+                            onClick={() => moveDeveloper(index, -1)}
+                            disabled={index === 0 || savingOrder}
+                            title="Move up"
+                            className="p-0.5 text-gray-400 hover:text-brand-black disabled:opacity-25 disabled:hover:text-gray-400"
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => moveDeveloper(index, 1)}
+                            disabled={index === developers.length - 1 || savingOrder}
+                            title="Move down"
+                            className="p-0.5 text-gray-400 hover:text-brand-black disabled:opacity-25 disabled:hover:text-gray-400"
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="w-20 h-14 rounded-lg border border-gray-100 bg-white p-1.5 flex items-center justify-center flex-shrink-0">
