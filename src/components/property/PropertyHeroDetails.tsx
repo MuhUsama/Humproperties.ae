@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
+import PhotoRing from "@/components/property/PhotoRing";
 import { useSettings } from "@/context/SettingsContext";
-import { Bed, Bath, Square, MapPin, Share2, Check, ArrowLeft, Phone, MessageCircle } from "lucide-react";
+import { Bed, Bath, Square, MapPin, Share2, Check, ArrowLeft, Phone, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
 export type HeroOptionProps = {
   property: {
@@ -45,6 +47,14 @@ function TopBar({ onShare, copied }: Pick<HeroOptionProps, "onShare" | "copied">
 export default function PropertyHeroDetails(p: HeroOptionProps) {
   const { property, galleryImages, activeIndex, setActiveIndex, openZoom, formatPrice, formatArea } = p;
   const { siteInfo } = useSettings();
+  const ringControls = useRef<{ by: (k: number) => void } | null>(null);
+  const n = galleryImages.length;
+  // The rotating ring needs a few photos to read as a circle; short galleries keep the flat row
+  const useRing = n >= 4;
+  const step = (k: number) => {
+    if (useRing && ringControls.current) ringControls.current.by(k);
+    else setActiveIndex((activeIndex + k + n) % n);
+  };
   const whatsappNumber = (siteInfo?.contact_phone || "+971 (04) 334 1131").replace(/[^0-9]/g, "");
   const whatsappText = encodeURIComponent(`Hello HUM Properties, I'm interested in ${property.title} (${property.location}).`);
   return (
@@ -52,21 +62,37 @@ export default function PropertyHeroDetails(p: HeroOptionProps) {
       <TopBar onShare={p.onShare} copied={p.copied} />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-8 items-start">
         <div>
-          <button onClick={() => openZoom(activeIndex)} className="relative block w-full aspect-[16/10] lg:aspect-auto lg:h-[calc(100svh-19rem)] lg:min-h-[340px] rounded-3xl overflow-hidden group">
-            <Image src={galleryImages[activeIndex]} alt={property.title} fill priority sizes="(max-width: 1024px) 100vw, 65vw" className="object-cover group-hover:scale-105 transition-transform duration-700" unoptimized={unopt(galleryImages[activeIndex])} />
-            <span className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold">{activeIndex + 1} / {galleryImages.length}</span>
-          </button>
-          <div className="flex gap-2 md:gap-3 mt-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {galleryImages.map((src, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveIndex(i)}
-                className={`relative flex-shrink-0 w-[calc(20%-0.4rem)] md:w-[calc(20%-0.6rem)] aspect-[4/3] lg:aspect-auto lg:h-20 rounded-xl overflow-hidden border-2 transition-all ${i === activeIndex ? "border-brand-gold" : "border-transparent opacity-60 hover:opacity-100"}`}
-              >
-                <Image src={src} alt="" fill sizes="20vw" className="object-cover" unoptimized={unopt(src)} />
-              </button>
-            ))}
+          <div className="relative">
+            <button onClick={() => openZoom(activeIndex)} className="relative block w-full aspect-[16/10] lg:aspect-auto lg:h-[calc(100svh-19rem)] lg:min-h-[340px] rounded-3xl overflow-hidden group">
+              <Image src={galleryImages[activeIndex]} alt={property.title} fill priority sizes="(max-width: 1024px) 100vw, 65vw" className="object-cover group-hover:scale-105 transition-transform duration-700" unoptimized={unopt(galleryImages[activeIndex])} />
+              <span className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold tabular-nums">{activeIndex + 1} / {n}</span>
+            </button>
+            {n > 1 && (
+              <>
+                <button type="button" onClick={() => step(-1)} aria-label="Previous photo" className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/90 hover:bg-brand-gold text-brand-black shadow-lg flex items-center justify-center transition-colors">
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button type="button" onClick={() => step(1)} aria-label="Next photo" className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/90 hover:bg-brand-gold text-brand-black shadow-lg flex items-center justify-center transition-colors">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
           </div>
+          {useRing ? (
+            <PhotoRing images={galleryImages} activeIndex={activeIndex} onFrontChange={setActiveIndex} controlsRef={ringControls} />
+          ) : n > 1 ? (
+            <div className="flex gap-2 md:gap-3 mt-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {galleryImages.map((src, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveIndex(i)}
+                  className={`relative flex-shrink-0 w-[calc(20%-0.4rem)] md:w-[calc(20%-0.6rem)] aspect-[4/3] lg:aspect-auto lg:h-20 rounded-xl overflow-hidden border-2 transition-all ${i === activeIndex ? "border-brand-gold" : "border-transparent opacity-60 hover:opacity-100"}`}
+                >
+                  <Image src={src} alt="" fill sizes="20vw" className="object-cover" unoptimized={unopt(src)} />
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <aside className="lg:sticky lg:top-28 bg-white rounded-3xl border border-gray-100 shadow-[0_15px_35px_rgba(0,0,0,0.06)] p-6 md:p-8">
