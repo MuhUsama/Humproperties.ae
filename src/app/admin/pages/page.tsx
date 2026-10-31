@@ -166,6 +166,24 @@ const SITE_PAGES: SitePageConfig[] = [
     description: "Off plan project investments in Dubai (Header Item).",
     icon: Building,
   },
+  {
+    slug: "services_commercial",
+    name: "Buy: Commercial",
+    url: "/properties/category/commercial",
+    group: "buy",
+    category: "Buy Category",
+    description: "Commercial properties for sale. Shown in the Buy menu, Services menu and Services page.",
+    icon: Building,
+  },
+  {
+    slug: "services_industrial",
+    name: "Buy: Industrial",
+    url: "/properties/category/industrial",
+    group: "buy",
+    category: "Buy Category",
+    description: "Industrial properties for sale. Shown in the Buy menu, Services menu and Services page.",
+    icon: Key,
+  },
 
   // --- Rent Sub-Pages & Filter Pages ---
   {
@@ -268,24 +286,6 @@ const SITE_PAGES: SitePageConfig[] = [
     category: "Service Page",
     description: "Professional licensed brokerage for private acquisitions and sales.",
     icon: Briefcase,
-  },
-  {
-    slug: "services_commercial",
-    name: "Services: Commercial Category",
-    url: "/properties/category/commercial",
-    group: "services",
-    category: "Service Page",
-    description: "Commercial properties category showcase and portfolio.",
-    icon: Building,
-  },
-  {
-    slug: "services_industrial",
-    name: "Services: Industrial Category",
-    url: "/properties/category/industrial",
-    group: "services",
-    category: "Service Page",
-    description: "Industrial properties category showcase and logistics hubs.",
-    icon: Key,
   },
   {
     slug: "services_interiordesign",

@@ -8,6 +8,14 @@ import PropertyFilterBar, { FilterState } from "@/components/property/PropertyFi
 import { useSettings } from "@/context/SettingsContext";
 import { isBuyStatus } from "@/lib/listingStatus";
 
+type ListingLike = { status?: string | null; city?: string | null };
+
+const matchesPurpose = (prop: ListingLike, purpose: string) =>
+  purpose === "Buy" ? isBuyStatus(prop.status) : (prop.status || "").toUpperCase().includes("RENT");
+
+const matchesCity = (prop: ListingLike, city: string) =>
+  city === "All Cities" || (prop.city || "Dubai") === city;
+
 export default function PropertyCategoryPage({ params }: { params: Promise<{ type: string }> }) {
   const unwrappedParams = use(params);
   const { formatPrice, formatArea } = useSettings();
@@ -18,8 +26,9 @@ export default function PropertyCategoryPage({ params }: { params: Promise<{ typ
     purpose: "Buy",
     priceRange: "Any Price",
     areaRange: "Any Area (sqft)",
-    city: "Dubai"
+    city: "All Cities"
   });
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
 
   // Capitalize the type for display (e.g. "industrial" -> "Industrial")
   const categoryType = unwrappedParams.type.charAt(0).toUpperCase() + unwrappedParams.type.slice(1).toLowerCase();
@@ -72,7 +81,49 @@ export default function PropertyCategoryPage({ params }: { params: Promise<{ typ
 
       {/* Main Content Area */}
       <div className="w-full mx-auto px-6 lg:px-12 mt-8 md:mt-16">
-        <PropertyFilterBar onFilterChange={setFilters} />
+        {(() => {
+          // Only offer cities that have a listing for the chosen purpose
+          const availableCities = Array.from(
+            new Set(
+              properties
+                .filter((p) => matchesPurpose(p, filters.purpose))
+                .map((p) => p.city || "Dubai")
+                .filter(Boolean)
+            )
+          ) as string[];
+          return <PropertyFilterBar onFilterChange={setFilters} initialFilters={filters} availableCities={availableCities} />;
+        })()}
+
+        {/* Sub-categories that have listings (e.g. Office, Warehouse) */}
+        {(() => {
+          const counts: Record<string, number> = {};
+          properties
+            .filter((p) => matchesPurpose(p, filters.purpose) && matchesCity(p, filters.city))
+            .forEach((p) => {
+              if (p.category) counts[p.category] = (counts[p.category] || 0) + 1;
+            });
+          const cats = Object.keys(counts);
+          if (cats.length < 2) return null;
+          const total = cats.reduce((sum, c) => sum + counts[c], 0);
+          const chip = (active: boolean) =>
+            `px-5 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+              active
+                ? "border-brand-gold bg-brand-gold/5 text-brand-gold"
+                : "border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+            }`;
+          return (
+            <div className="flex flex-wrap gap-3 mt-8">
+              <button onClick={() => setSelectedCategory("All Categories")} className={chip(selectedCategory === "All Categories")}>
+                All Categories <span className="opacity-60 text-xs ml-1">({total})</span>
+              </button>
+              {cats.map((cat) => (
+                <button key={cat} onClick={() => setSelectedCategory(cat)} className={chip(selectedCategory === cat)}>
+                  {cat} <span className="opacity-60 text-xs ml-1">({counts[cat]})</span>
+                </button>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Properties Grid */}
         {loading ? (
@@ -84,11 +135,10 @@ export default function PropertyCategoryPage({ params }: { params: Promise<{ typ
             // Search Filter
             if (filters.search && !prop.title?.toLowerCase().includes(filters.search.toLowerCase()) && !prop.location?.toLowerCase().includes(filters.search.toLowerCase())) return false;
             
-            // Purpose Filter
-            const isBuy = filters.purpose === "Buy";
-            const propStatus = prop.status?.toUpperCase() || "";
-            if (isBuy && !isBuyStatus(propStatus)) return false;
-            if (!isBuy && !propStatus.includes("RENT")) return false;
+            // Purpose, City and Sub-category Filters
+            if (!matchesPurpose(prop, filters.purpose)) return false;
+            if (!matchesCity(prop, filters.city)) return false;
+            if (selectedCategory !== "All Categories" && prop.category !== selectedCategory) return false;
 
             // Price Filter
             if (filters.priceRange !== "Any Price" && prop.price) {
