@@ -15,6 +15,7 @@ export type OffPlanDeveloper = {
 // Same card as the Buy page, so off plan listings look like the rest of the site
 export default function OffPlanListingCard({
   property,
+  developer,
   index = 0,
 }: {
   property: any;
@@ -42,6 +43,13 @@ export default function OffPlanListingCard({
             </span>
           )}
         </div>
+        {/* Developer logo badge, only when the listing has a developer with a logo */}
+        {developer?.logo && (
+          <div className="absolute bottom-4 left-4 z-10 h-11 px-3.5 bg-white rounded-xl shadow-lg flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={developer.logo} alt={developer.name} title={developer.name} className="h-5 w-20 object-contain" />
+          </div>
+        )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={property.image || "/placeholder-property.jpg"}
