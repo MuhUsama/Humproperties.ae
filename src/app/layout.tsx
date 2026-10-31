@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, Cinzel, Cormorant_Garamond, Montserrat } from "next/font/google";
+import { Cormorant_Garamond, Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import { Providers } from "./Providers";
 import "./globals.css";
 
@@ -7,12 +8,23 @@ const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat
 const cormorant = Cormorant_Garamond({ 
   subsets: ["latin"], 
   weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
   variable: "--font-cormorant" 
 });
-// Luxury display faces: Bodoni Moda for the hero headline, Cinzel for the menu and buttons
-const bodoni = Bodoni_Moda({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-bodoni" });
-const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-cinzel" });
+// Luxury display faces, self-hosted (Google Fonts downloads failed on the Hostinger build):
+// Bodoni Moda for the hero headline, Cinzel for the menu and buttons
+const bodoni = localFont({
+  src: [
+    { path: "../fonts/BodoniModa-Variable.woff2", weight: "400 900", style: "normal" },
+    { path: "../fonts/BodoniModa-Italic-Variable.woff2", weight: "400 900", style: "italic" },
+  ],
+  variable: "--font-bodoni",
+  display: "swap",
+});
+const cinzel = localFont({
+  src: [{ path: "../fonts/Cinzel-Variable.woff2", weight: "400 600", style: "normal" }],
+  variable: "--font-cinzel",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "HUM Properties | Luxury Properties in Dubai",
