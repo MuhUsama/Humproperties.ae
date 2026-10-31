@@ -80,6 +80,7 @@ export default function PropertyDetailsPage() {
       title: listing.title || "Exclusive Luxury Residence",
       price: listing.price || "Price Upon Request",
       location: listing.location || "Dubai, United Arab Emirates",
+      city: listing.city || "Dubai",
       beds: listing.beds !== undefined && listing.beds !== null && listing.beds !== "" ? Number(listing.beds) : 4,
       baths: listing.baths !== undefined && listing.baths !== null && listing.baths !== "" ? Number(listing.baths) : 5,
       sqft: String(listing.sqft || "5,000"),
