@@ -36,7 +36,8 @@ nav, header {
   pointer-events: none;
 }
 html.hum-intro-skip .hum-intro { display: none; }
-html.hum-intro-active { overflow: hidden; }
+/* No scroll lock during the intro: the scrollbar stays put (no late appearance, no sideways jump)
+   and scrolling simply skips the intro (see IntroSplash skipEvents). */
 
 .hum-intro__veil {
   position: absolute;
