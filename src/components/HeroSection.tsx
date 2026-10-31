@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useEffect, useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -83,20 +82,6 @@ const HeroSection = memo(function HeroSection() {
             )}
           </AnimatePresence>
         </h1>
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 12 }}
-          transition={{ duration: 1, ease, delay: 0.5 }}
-          className="mt-8 md:mt-10 flex items-center gap-7"
-        >
-          <Link href="/buy" className="font-luxe text-xs uppercase tracking-[0.24em] font-medium bg-white text-brand-black px-7 py-3.5 hover:bg-brand-gold hover:text-white transition-colors">
-            Explore properties
-          </Link>
-          <Link href="#contact" className="hidden sm:inline font-luxe text-xs uppercase tracking-[0.24em] font-medium border-b border-white/50 pb-1 hover:text-brand-gold hover:border-brand-gold transition-colors">
-            Contact an agent
-          </Link>
-        </motion.div>
       </div>
     </section>
   );
