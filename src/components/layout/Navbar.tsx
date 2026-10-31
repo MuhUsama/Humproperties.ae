@@ -61,8 +61,8 @@ const subServices: SubPageItem[] = [
 const buyCategories: SubPageItem[] = [
   { id: "buy_ready", title: "Ready", href: "/buy?status=ready" },
   { id: "buy_offplan", title: "Off Plan", href: "/off-plan" },
-  { id: "buy_commercial", title: "Commercial", href: "/properties/category/commercial" },
-  { id: "buy_industrial", title: "Industrial", href: "/properties/category/industrial" },
+  { id: "services_commercial", title: "Commercial", href: "/properties/category/commercial" },
+  { id: "services_industrial", title: "Industrial", href: "/properties/category/industrial" },
 ];
 
 const rentCategories: SubPageItem[] = [
