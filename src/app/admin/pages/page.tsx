@@ -166,6 +166,24 @@ const SITE_PAGES: SitePageConfig[] = [
     description: "Off plan project investments in Dubai (Header Item).",
     icon: Building,
   },
+  {
+    slug: "buy_commercial",
+    name: "Buy: Commercial",
+    url: "/properties/category/commercial",
+    group: "buy",
+    category: "Buy Category",
+    description: "Commercial properties for sale (Header Item).",
+    icon: Building,
+  },
+  {
+    slug: "buy_industrial",
+    name: "Buy: Industrial",
+    url: "/properties/category/industrial",
+    group: "buy",
+    category: "Buy Category",
+    description: "Industrial properties for sale (Header Item).",
+    icon: Key,
+  },
 
   // --- Rent Sub-Pages & Filter Pages ---
   {
