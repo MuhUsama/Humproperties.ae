@@ -508,10 +508,10 @@ export default function Navbar() {
           {!isPageHidden("contact") && (
             <Link
               href="/contact"
-              className={`px-6 py-2.5 font-luxe font-semibold uppercase text-xs tracking-[0.2em] transition-all duration-300 border ${
+              className={`px-6 py-2.5 font-luxe font-semibold uppercase text-xs tracking-[0.22em] transition-all duration-300 border ${
                 dark
-                  ? "bg-brand-gold text-brand-black border-brand-gold hover:bg-white hover:border-white"
-                  : "bg-brand-black text-white border-brand-black hover:bg-brand-gold hover:text-brand-black hover:border-brand-gold"
+                  ? "border-brand-gold/70 text-brand-gold hover:bg-brand-gold hover:text-brand-black hover:border-brand-gold"
+                  : "border-brand-black text-brand-black hover:bg-brand-black hover:text-white"
               }`}
             >
               Contact Us
