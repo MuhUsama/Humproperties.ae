@@ -33,9 +33,9 @@ const itemVariants: any = {
 };
 
 const dropdownVariants: any = {
-  hidden: { opacity: 0, y: -10, x: "-50%", scale: 0.95, filter: "blur(4px)" },
-  visible: { opacity: 1, y: 0, x: "-50%", scale: 1, filter: "blur(0px)", transition: { duration: 0.2, ease: "easeOut" } },
-  exit: { opacity: 0, y: -5, x: "-50%", scale: 0.98, filter: "blur(2px)", transition: { duration: 0.15, ease: "easeIn" } }
+  hidden: { opacity: 0, y: -8, filter: "blur(4px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.25, ease: "easeOut" } },
+  exit: { opacity: 0, y: -4, filter: "blur(2px)", transition: { duration: 0.15, ease: "easeIn" } }
 };
 
 interface SubPageItem {
@@ -307,9 +307,9 @@ export default function Navbar() {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="absolute top-full left-1/2 pt-2"
+                className="absolute top-full -left-1 pt-3"
               >
-                <div className="w-[280px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
+                <div className="w-[280px] bg-[#0d0b08]/90 backdrop-blur-md border border-white/10 border-t-brand-gold overflow-hidden px-6 py-5 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]">
                   <div className="flex flex-col space-y-4">
                     {visibleSubServices.map((sub, idx) => (
                       <Link 
@@ -318,14 +318,14 @@ export default function Navbar() {
                         className="group flex items-center space-x-2 py-2"
                       >
                         <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
-                        <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
+                        <span className="font-luxe text-[12px] uppercase tracking-[0.14em] text-white/80 group-hover:text-brand-gold transition-colors duration-200">
                           {sub.title}
                         </span>
                       </Link>
                     ))}
                   </div>
-                  <div className="mt-6 pt-4 border-t border-gray-100 text-center">
-                    <Link href="/services" className="text-xs font-bold text-brand-gold uppercase tracking-widest hover:text-brand-black transition-colors">
+                  <div className="mt-5 pt-4 border-t border-white/10 text-center">
+                    <Link href="/services" className="font-luxe text-[11px] font-semibold text-brand-gold uppercase tracking-[0.24em] hover:text-white transition-colors">
                       View All Services
                     </Link>
                   </div>
@@ -344,9 +344,9 @@ export default function Navbar() {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="absolute top-full left-1/2 pt-2"
+                className="absolute top-full -left-1 pt-3"
               >
-                <div className="w-[320px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
+                <div className="w-[320px] bg-[#0d0b08]/90 backdrop-blur-md border border-white/10 border-t-brand-gold overflow-hidden px-6 py-5 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]">
                   <div className="flex flex-col space-y-4">
                     {visibleBuyCategories.map((sub, idx) => {
                       if (sub.isClickable === false) {
@@ -356,7 +356,7 @@ export default function Navbar() {
                             className="flex items-center space-x-2 py-2 cursor-default select-none pointer-events-none"
                           >
                             <div className="w-1.5 h-1.5 rounded-full bg-brand-gold" />
-                            <span className="text-sm font-semibold text-brand-black tracking-wide">
+                            <span className="font-luxe text-[11px] uppercase tracking-[0.3em] text-brand-gold">
                               {sub.title}
                             </span>
                           </div>
@@ -369,7 +369,7 @@ export default function Navbar() {
                           className="group flex items-center space-x-2 py-2"
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
+                          <span className="font-luxe text-[12px] uppercase tracking-[0.14em] text-white/80 group-hover:text-brand-gold transition-colors duration-200">
                             {sub.title}
                           </span>
                         </Link>
@@ -391,9 +391,9 @@ export default function Navbar() {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="absolute top-full left-1/2 pt-2"
+                className="absolute top-full -left-1 pt-3"
               >
-                <div className="w-[320px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
+                <div className="w-[320px] bg-[#0d0b08]/90 backdrop-blur-md border border-white/10 border-t-brand-gold overflow-hidden px-6 py-5 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]">
                   <div className="flex flex-col space-y-4">
                     {visibleRentCategories.map((sub, idx) => (
                       <Link 
@@ -402,7 +402,7 @@ export default function Navbar() {
                         className="group flex items-center space-x-2 py-2"
                       >
                         <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
-                        <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
+                        <span className="font-luxe text-[12px] uppercase tracking-[0.14em] text-white/80 group-hover:text-brand-gold transition-colors duration-200">
                           {sub.title}
                         </span>
                       </Link>
@@ -479,24 +479,24 @@ export default function Navbar() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-none"
+                  className="absolute top-full right-0 mt-3 w-64 bg-[#0d0b08]/90 backdrop-blur-md border border-white/10 border-t-brand-gold overflow-hidden shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]"
                 >
                   <div className="p-4 space-y-4">
                     {/* Currency Setting */}
                     <div>
-                      <h4 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Currency</h4>
-                      <div className="flex bg-gray-50 rounded-lg p-1">
-                        <button onClick={() => setCurrency("AED")} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${currency === "AED" ? "bg-white text-brand-black" : "text-gray-500 hover:text-brand-black"}`}>AED</button>
-                        <button onClick={() => setCurrency("USD")} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${currency === "USD" ? "bg-white text-brand-black" : "text-gray-500 hover:text-brand-black"}`}>USD</button>
-                        <button onClick={() => setCurrency("EUR")} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${currency === "EUR" ? "bg-white text-brand-black" : "text-gray-500 hover:text-brand-black"}`}>EUR</button>
+                      <h4 className="font-luxe text-[10px] uppercase tracking-[0.3em] text-brand-gold mb-2">Currency</h4>
+                      <div className="flex border border-white/10 p-1">
+                        <button onClick={() => setCurrency("AED")} className={`flex-1 py-1.5 text-xs font-semibold transition-all ${currency === "AED" ? "bg-brand-gold text-brand-black" : "text-white/60 hover:text-white"}`}>AED</button>
+                        <button onClick={() => setCurrency("USD")} className={`flex-1 py-1.5 text-xs font-semibold transition-all ${currency === "USD" ? "bg-brand-gold text-brand-black" : "text-white/60 hover:text-white"}`}>USD</button>
+                        <button onClick={() => setCurrency("EUR")} className={`flex-1 py-1.5 text-xs font-semibold transition-all ${currency === "EUR" ? "bg-brand-gold text-brand-black" : "text-white/60 hover:text-white"}`}>EUR</button>
                       </div>
                     </div>
                     {/* Area Setting */}
                     <div>
-                      <h4 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Area Unit</h4>
-                      <div className="flex bg-gray-50 rounded-lg p-1">
-                        <button onClick={() => setAreaUnit("SQFT")} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${areaUnit === "SQFT" ? "bg-white text-brand-black" : "text-gray-500 hover:text-brand-black"}`}>Sq.Ft</button>
-                        <button onClick={() => setAreaUnit("SQM")} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${areaUnit === "SQM" ? "bg-white text-brand-black" : "text-gray-500 hover:text-brand-black"}`}>Sq.M</button>
+                      <h4 className="font-luxe text-[10px] uppercase tracking-[0.3em] text-brand-gold mb-2">Area Unit</h4>
+                      <div className="flex border border-white/10 p-1">
+                        <button onClick={() => setAreaUnit("SQFT")} className={`flex-1 py-1.5 text-xs font-semibold transition-all ${areaUnit === "SQFT" ? "bg-brand-gold text-brand-black" : "text-white/60 hover:text-white"}`}>Sq.Ft</button>
+                        <button onClick={() => setAreaUnit("SQM")} className={`flex-1 py-1.5 text-xs font-semibold transition-all ${areaUnit === "SQM" ? "bg-brand-gold text-brand-black" : "text-white/60 hover:text-white"}`}>Sq.M</button>
                       </div>
                     </div>
                   </div>
@@ -508,10 +508,10 @@ export default function Navbar() {
           {!isPageHidden("contact") && (
             <Link
               href="/contact"
-              className={`px-6 py-2.5 font-luxe font-semibold uppercase text-xs tracking-[0.2em] transition-all duration-300 border ${
+              className={`px-6 py-2.5 font-luxe font-semibold uppercase text-xs tracking-[0.22em] transition-all duration-300 border ${
                 dark
-                  ? "bg-brand-gold text-brand-black border-brand-gold hover:bg-white hover:border-white"
-                  : "bg-brand-black text-white border-brand-black hover:bg-brand-gold hover:text-brand-black hover:border-brand-gold"
+                  ? "border-brand-gold/70 text-brand-gold hover:bg-brand-gold hover:text-brand-black hover:border-brand-gold"
+                  : "border-brand-black text-brand-black hover:bg-brand-black hover:text-white"
               }`}
             >
               Contact Us

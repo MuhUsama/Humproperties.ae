@@ -50,27 +50,31 @@ const HeroSection = memo(function HeroSection() {
       />
       <div className="absolute inset-0 bg-black/50" />
       <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
+      {/* Darker base so the bottom-left text reads over the skyline */}
+      <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
 
-      <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+      <div className="absolute z-10 inset-x-0 bottom-0 px-6 md:px-12 pb-14 md:pb-20">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: ready ? 1 : 0 }}
           transition={{ duration: 1.2 }}
-          className="font-luxe text-[10px] md:text-xs uppercase tracking-[0.5em] pl-[0.5em] text-white/75 mb-6 md:mb-8"
+          className="font-luxe flex items-center gap-4 text-[10px] md:text-xs uppercase tracking-[0.45em] text-white/75 mb-5 md:mb-7"
         >
+          <span className="h-px w-10 md:w-16 bg-brand-gold" />
           Dubai · Luxury Real Estate
         </motion.p>
 
-        <h1 className="font-display font-normal leading-[1.05] tracking-[-0.01em] text-[2.4rem] sm:text-6xl md:text-7xl lg:text-[5.6rem] max-w-6xl min-h-[3.15em] sm:min-h-[2.1em]">
+        <h1 className="font-display font-normal leading-[1.05] tracking-[-0.01em] text-[2.4rem] sm:text-6xl md:text-7xl lg:text-[5.4rem] max-w-5xl min-h-[3.15em] sm:min-h-[2.1em]">
           <AnimatePresence mode="wait">
             {ready && (
               <motion.span key={line} className="block" exit={{ opacity: 0, y: -24, filter: "blur(6px)" }} transition={{ duration: 0.6, ease }}>
-                <span className="block overflow-hidden pb-[0.06em]">
+                {/* Masks leave room below the line so Bodoni's long descenders (g, y) are not clipped */}
+                <span className="block overflow-hidden pb-[0.24em] -mb-[0.18em]">
                   <motion.span className="block" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1.1, ease }}>
                     {current.lead}
                   </motion.span>
                 </span>
-                <span className="block overflow-hidden pb-[0.12em]">
+                <span className="block overflow-hidden pb-[0.26em] -mb-[0.14em]">
                   <motion.span className="block italic text-brand-gold-light" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1.1, ease, delay: 0.12 }}>
                     {current.accent}
                   </motion.span>
@@ -94,28 +98,6 @@ const HeroSection = memo(function HeroSection() {
           </Link>
         </motion.div>
       </div>
-
-      {/* Which line is showing; tap to jump */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: ready ? 1 : 0 }}
-        transition={{ duration: 1, delay: 0.8 }}
-        className="absolute z-10 bottom-8 md:bottom-12 inset-x-0 flex justify-center gap-2.5"
-      >
-        {LINES.map((l, i) => (
-          <button key={l.accent} onClick={() => setLine(i)} aria-label={`Show line ${i + 1}`} className="relative h-[2px] w-10 md:w-14 bg-white/25 overflow-hidden">
-            {i === line && ready && (
-              <motion.span
-                key={`bar-${line}`}
-                className="absolute inset-y-0 left-0 bg-brand-gold"
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: LINE_MS / 1000, ease: "linear" }}
-              />
-            )}
-          </button>
-        ))}
-      </motion.div>
     </section>
   );
 });
