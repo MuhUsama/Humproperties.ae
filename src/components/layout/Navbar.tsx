@@ -61,6 +61,9 @@ const subServices: SubPageItem[] = [
 const buyCategories: SubPageItem[] = [
   { id: "buy_ready", title: "Ready", href: "/buy?status=ready" },
   { id: "buy_offplan", title: "Off Plan", href: "/off-plan" },
+  // Same ids as the category pages, so hiding a page in admin also hides its link here
+  { id: "services_commercial", title: "Commercial", href: "/properties/category/commercial" },
+  { id: "services_industrial", title: "Industrial", href: "/properties/category/industrial" },
 ];
 
 const rentCategories: SubPageItem[] = [
@@ -107,7 +110,7 @@ export default function Navbar() {
   const phone = siteInfo?.contact_phone || "+971 (04) 334 1131";
   const email = siteInfo?.contact_email || "info@mfreuae.com";
 
-  // Buy dropdown: Ready (ready properties) and Off Plan (developers page)
+  // Buy dropdown: Ready, Off Plan (developers page), Commercial and Industrial
   const visibleBuyCategories = useMemo(() => {
     return buyCategories.filter((item) => !isPageHidden(item.id));
   }, [isPageHidden]);
