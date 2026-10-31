@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Montserrat } from "next/font/google";
+import { Bodoni_Moda, Cinzel, Cormorant_Garamond, Montserrat } from "next/font/google";
 import { Providers } from "./Providers";
 import "./globals.css";
 
@@ -7,8 +7,12 @@ const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat
 const cormorant = Cormorant_Garamond({ 
   subsets: ["latin"], 
   weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-cormorant" 
 });
+// Luxury display faces: Bodoni Moda for the hero headline, Cinzel for the menu and buttons
+const bodoni = Bodoni_Moda({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-bodoni" });
+const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-cinzel" });
 
 export const metadata: Metadata = {
   title: "HUM Properties | Luxury Properties in Dubai",
@@ -48,7 +52,7 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="/hero_poster.jpg" fetchPriority="high" />
         <link rel="preload" as="video" href="/hero_section_video.webm" />
       </head>
-      <body className={`${montserrat.variable} ${cormorant.variable} font-sans antialiased bg-[#faf9f7] text-brand-black`}>
+      <body className={`${montserrat.variable} ${cormorant.variable} ${bodoni.variable} ${cinzel.variable} font-sans antialiased bg-[#faf9f7] text-brand-black`}>
         <Providers siteInfo={siteInfo}>
           {children}
         </Providers>

@@ -1,60 +1,121 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+const ease = [0.22, 1, 0.36, 1] as const;
+
+// Each line is a plain part and a gold italic part; they take turns in the middle of the hero
+const LINES = [
+  { lead: "Extraordinary Living,", accent: "Defined." },
+  { lead: "The Art of Living in", accent: "Dubai" },
+  { lead: "Where Dubai Lives", accent: "Above the Ordinary" },
+  { lead: "Exceptional Homes.", accent: "Exceptional Lives." },
+];
+const LINE_MS = 4800;
+// The brand intro (IntroSplash) lands its logo in the header about 3.6s after first paint
+const AFTER_INTRO_MS = 3600;
 
 const HeroSection = memo(function HeroSection() {
-  return (
-    <section className="relative w-full p-5 md:p-10 lg:p-12 flex flex-col items-center justify-center h-[calc(100svh-5rem)]">
-      <div 
-        className="relative w-full flex-1 min-h-[440px] rounded-[2rem] md:rounded-[2.5rem] bg-black isolate transform-gpu overflow-hidden flex items-end justify-start text-left shadow-none group px-6 py-10 md:px-24 md:py-20 animate-[fadeInUp_0.8s_ease-out_forwards]"
-      >
-        {/* Video Background */}
-        <motion.div
-          className="absolute inset-0 w-full h-full scale-105 group-hover:scale-100 transition-transform duration-[10s] ease-out"
-        >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster="/hero_poster.jpg"
-            className="absolute inset-0 w-full h-full object-cover z-0 rounded-[2rem] md:rounded-[2.5rem]"
-            src="/hero_section_video.webm"
-            // @ts-ignore - fetchpriority is valid but Next.js types might complain depending on version
-            fetchPriority="high"
-          >
-            Your browser does not support the video tag.
-          </video>
-        </motion.div>
-        
-        {/* Dark Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
+  const [ready, setReady] = useState(false);
+  const [line, setLine] = useState(0);
 
-        {/* Hero Text */}
-        <div className="relative z-20 max-w-3xl pt-6 md:pt-0">
-          <p className="text-brand-gold font-semibold tracking-[0.2em] text-xs md:text-sm uppercase mb-2 md:mb-3">
-            Welcome to Dubai
-          </p>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.1] mb-4 md:mb-5">
-            Extraordinary <br />
-            Luxury Properties
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-6 md:mb-8 max-w-xl">
-            Discover the most exclusive homes, apartments, and investments in the heart of the UAE. Your vision, our expertise.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-start gap-3 md:gap-4 w-full sm:w-auto">
-            <Link href="/buy" className="w-full sm:w-auto bg-brand-gold hover:bg-brand-gold-light text-white px-8 py-3 rounded-full font-medium transition-all shadow-none hover:-translate-y-1">
-              Explore Properties
-            </Link>
-            <Link href="#contact" className="w-full sm:w-auto bg-black/30 backdrop-blur-md border border-white/50 text-white hover:bg-white hover:text-brand-black px-8 py-3 rounded-full font-medium transition-all hover:-translate-y-1">
-              Contact an Agent
-            </Link>
-          </div>
-        </div>
+  useEffect(() => {
+    const introPlaying = document.documentElement.classList.contains("hum-intro-active");
+    const t = setTimeout(() => setReady(true), introPlaying ? AFTER_INTRO_MS : 200);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    const t = setInterval(() => setLine((n) => (n + 1) % LINES.length), LINE_MS);
+    return () => clearInterval(t);
+  }, [ready]);
+
+  const current = LINES[line];
+
+  return (
+    <section className="relative w-full h-[100svh] min-h-[600px] bg-black overflow-hidden text-white">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="/hero_poster.jpg"
+        className="absolute inset-0 w-full h-full object-cover"
+        src="/hero_section_video.webm"
+        // @ts-ignore - fetchpriority is valid but Next.js types might complain depending on version
+        fetchPriority="high"
+      />
+      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
+
+      <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: ready ? 1 : 0 }}
+          transition={{ duration: 1.2 }}
+          className="font-luxe text-[10px] md:text-xs uppercase tracking-[0.5em] pl-[0.5em] text-white/75 mb-6 md:mb-8"
+        >
+          Dubai · Luxury Real Estate
+        </motion.p>
+
+        <h1 className="font-display font-normal leading-[1.05] tracking-[-0.01em] text-[2.4rem] sm:text-6xl md:text-7xl lg:text-[5.6rem] max-w-6xl min-h-[3.15em] sm:min-h-[2.1em]">
+          <AnimatePresence mode="wait">
+            {ready && (
+              <motion.span key={line} className="block" exit={{ opacity: 0, y: -24, filter: "blur(6px)" }} transition={{ duration: 0.6, ease }}>
+                <span className="block overflow-hidden pb-[0.06em]">
+                  <motion.span className="block" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1.1, ease }}>
+                    {current.lead}
+                  </motion.span>
+                </span>
+                <span className="block overflow-hidden pb-[0.12em]">
+                  <motion.span className="block italic text-brand-gold-light" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1.1, ease, delay: 0.12 }}>
+                    {current.accent}
+                  </motion.span>
+                </span>
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </h1>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 12 }}
+          transition={{ duration: 1, ease, delay: 0.5 }}
+          className="mt-8 md:mt-10 flex items-center gap-7"
+        >
+          <Link href="/buy" className="font-luxe text-xs uppercase tracking-[0.24em] font-medium bg-white text-brand-black px-7 py-3.5 hover:bg-brand-gold hover:text-white transition-colors">
+            Explore properties
+          </Link>
+          <Link href="#contact" className="hidden sm:inline font-luxe text-xs uppercase tracking-[0.24em] font-medium border-b border-white/50 pb-1 hover:text-brand-gold hover:border-brand-gold transition-colors">
+            Contact an agent
+          </Link>
+        </motion.div>
       </div>
+
+      {/* Which line is showing; tap to jump */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: ready ? 1 : 0 }}
+        transition={{ duration: 1, delay: 0.8 }}
+        className="absolute z-10 bottom-8 md:bottom-12 inset-x-0 flex justify-center gap-2.5"
+      >
+        {LINES.map((l, i) => (
+          <button key={l.accent} onClick={() => setLine(i)} aria-label={`Show line ${i + 1}`} className="relative h-[2px] w-10 md:w-14 bg-white/25 overflow-hidden">
+            {i === line && ready && (
+              <motion.span
+                key={`bar-${line}`}
+                className="absolute inset-y-0 left-0 bg-brand-gold"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: LINE_MS / 1000, ease: "linear" }}
+              />
+            )}
+          </button>
+        ))}
+      </motion.div>
     </section>
   );
 });

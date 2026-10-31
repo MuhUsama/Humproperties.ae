@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -82,6 +83,10 @@ export default function Navbar() {
   const [isMobileBuyOpen, setIsMobileBuyOpen] = useState(false);
   const [isMobileRentOpen, setIsMobileRentOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const pathname = usePathname();
+  // On the home page the header sits transparent over the full-screen hero film until the visitor scrolls
+  const overHero = !scrolled && !isOpen && pathname === "/";
+  const dark = scrolled || isOpen || overHero;
 
   const { currency, setCurrency, areaUnit, setAreaUnit, siteInfo, isPageHidden } = useSettings();
   const [liveListings, setLiveListings] = useState<any[] | null>(null);
@@ -206,241 +211,252 @@ export default function Navbar() {
     return result;
   }, [siteInfo?.navbar_menu_order, isPageHidden]);
 
+  // The right half also carries the settings and Contact buttons, so the left takes one more link
+  const leftCount = Math.ceil((navLinks.length + 1) / 2);
+
+  // One desktop nav item with its dropdown; used for both halves of the split menu
+  const renderNavItem = (item: string, i: number) => {
+            const isDropdownActive =
+        (item === "Property Services" && isServicesHovered) ||
+        (item === "Buy" && isBuyHovered) ||
+        (item === "Rent" && isRentHovered && isRentHasDropdown);
+
+      return (
+        <motion.div
+          key={item}
+          className="relative hum-intro-item"
+          style={{ "--i": i + 1 } as React.CSSProperties}
+          onMouseEnter={() => {
+            if (item === "Property Services") setIsServicesHovered(true);
+            if (item === "Buy") setIsBuyHovered(true);
+            if (item === "Rent" && isRentHasDropdown) setIsRentHovered(true);
+          }}
+          onMouseLeave={() => {
+            if (item === "Property Services") setIsServicesHovered(false);
+            if (item === "Buy") setIsBuyHovered(false);
+            if (item === "Rent") setIsRentHovered(false);
+          }}
+        >
+          <Link
+            href={
+              item === "Buy"
+                ? "/buy"
+                : item === "Rent"
+                  ? "/rent"
+                  : item === "About" 
+                  ? "/about" 
+                  : item === "Insights"
+                    ? "/blogs"
+                    : item === "Sell"
+                      ? "/sell"
+                      : item === "Property Services" 
+                        ? "/services" 
+                        : item === "Invest"
+                          ? "/invest"
+                          : item === "FAQs"
+                            ? "/faq"
+                            : `/#${item.toLowerCase().replace(" ", "-")}`
+            }
+            className={`group flex items-center space-x-1 whitespace-nowrap font-luxe font-medium uppercase text-[11px] xl:text-[13px] tracking-[0.14em] transition-all duration-200 cursor-pointer py-4 px-1 relative z-[80] ${
+              isDropdownActive
+                ? "font-bold text-brand-gold"
+                : "font-medium hover:font-bold"
+            } ${
+              dark
+                ? isDropdownActive
+                  ? "text-brand-gold"
+                  : "text-white hover:text-brand-gold"
+                : isDropdownActive
+                  ? "text-brand-gold"
+                  : "text-brand-black hover:text-brand-gold"
+            }`}
+          >
+            <span className="relative inline-flex items-center">
+              {item === "Property Services" ? "Services" : item}
+              {/* Noticeable animated bottom gold accent line on hover */}
+              <span
+                className={`absolute -bottom-1 left-0 h-[2.5px] bg-brand-gold rounded-full transition-all duration-300 pointer-events-none ${
+                  isDropdownActive
+                    ? "w-full opacity-100"
+                    : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
+                }`}
+              />
+            </span>
+            {(item === "Property Services" || item === "Buy" || (item === "Rent" && isRentHasDropdown)) && (
+              <svg
+                className={`w-4 h-4 ml-1 transition-all duration-300 ${
+                  isDropdownActive
+                    ? "rotate-180 text-brand-gold stroke-[2.5]"
+                    : "opacity-70 group-hover:opacity-100 group-hover:text-brand-gold group-hover:stroke-[2.5]"
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </Link>
+
+        {/* Desktop Dropdown Menu for Property Services */}
+        {item === "Property Services" && (
+          <AnimatePresence>
+            {isServicesHovered && (
+              <motion.div
+                variants={dropdownVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="absolute top-full left-1/2 pt-2"
+              >
+                <div className="w-[280px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
+                  <div className="flex flex-col space-y-4">
+                    {visibleSubServices.map((sub, idx) => (
+                      <Link 
+                        key={sub.title}
+                        href={sub.href}
+                        className="group flex items-center space-x-2 py-2"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
+                          {sub.title}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+                    <Link href="/services" className="text-xs font-bold text-brand-gold uppercase tracking-widest hover:text-brand-black transition-colors">
+                      View All Services
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+
+        {/* Desktop Dropdown Menu for Buy */}
+        {item === "Buy" && visibleBuyCategories.length > 0 && (
+          <AnimatePresence>
+            {isBuyHovered && (
+              <motion.div
+                variants={dropdownVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="absolute top-full left-1/2 pt-2"
+              >
+                <div className="w-[320px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
+                  <div className="flex flex-col space-y-4">
+                    {visibleBuyCategories.map((sub, idx) => {
+                      if (sub.isClickable === false) {
+                        return (
+                          <div 
+                            key={sub.id || sub.title}
+                            className="flex items-center space-x-2 py-2 cursor-default select-none pointer-events-none"
+                          >
+                            <div className="w-1.5 h-1.5 rounded-full bg-brand-gold" />
+                            <span className="text-sm font-semibold text-brand-black tracking-wide">
+                              {sub.title}
+                            </span>
+                          </div>
+                        );
+                      }
+                      return (
+                        <Link 
+                          key={sub.title}
+                          href={sub.href}
+                          className="group flex items-center space-x-2 py-2"
+                        >
+                          <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
+                            {sub.title}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+
+        {/* Desktop Dropdown Menu for Rent */}
+        {item === "Rent" && visibleRentCategories.length > 0 && (
+          <AnimatePresence>
+            {isRentHovered && (
+              <motion.div
+                variants={dropdownVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="absolute top-full left-1/2 pt-2"
+              >
+                <div className="w-[320px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
+                  <div className="flex flex-col space-y-4">
+                    {visibleRentCategories.map((sub, idx) => (
+                      <Link 
+                        key={sub.title}
+                        href={sub.href}
+                        className="group flex items-center space-x-2 py-2"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
+                          {sub.title}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+      </motion.div>
+    );
+  };
+
   return (
     <nav
       data-hum-header
       className={`fixed top-0 w-full z-50 transition-all duration-500 border-none shadow-none ${
         isOpen 
           ? "bg-transparent py-2" // Transparent when menu is open so it blends
+          : overHero
+            ? "bg-gradient-to-b from-black/50 to-transparent py-2"
           : scrolled 
             ? "bg-black/70 backdrop-blur-lg py-1 border-none shadow-none" 
             : "bg-[#faf9f7] py-2 border-none shadow-none"
       }`}
       style={{ boxShadow: "none" }}
     >
-      <div className="w-full mx-auto px-6 lg:px-12 flex items-center relative z-50">
-        {/* Logo */}
-        <div className="flex-none relative z-[60] w-40 sm:w-44">
-          <a href="/" className="flex items-center space-x-2 w-full" onClick={() => setIsOpen(false)}>
-            <div className="relative flex items-center h-20 sm:h-24 w-full transition-all duration-500">
+      <div className="w-full mx-auto px-6 lg:px-12 flex lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center relative z-50">
+        {/* Desktop links, left half */}
+        <div className="hidden lg:flex items-center gap-3 xl:gap-6 z-[80]">
+          {navLinks.slice(0, leftCount).map((item, i) => renderNavItem(item, i))}
+        </div>
+
+        {/* Logo, centred between the two halves on desktop */}
+        <div className="flex-none relative z-[60] w-40 sm:w-44 lg:mx-8 xl:mx-12">
+          <a href="/" className="flex items-center lg:justify-center space-x-2 w-full" onClick={() => setIsOpen(false)}>
+            <div className="relative flex items-center lg:justify-center h-20 sm:h-24 w-full transition-all duration-500">
               <AnimatedLogo
                 introTarget
                 size="compact"
-                light={scrolled || isOpen}
-                className={`transition-transform duration-500 origin-left ${scrolled && !isOpen ? 'scale-90' : 'scale-100'}`}
+                light={dark}
+                className={`transition-transform duration-500 origin-left lg:origin-center ${scrolled && !isOpen ? 'scale-90' : 'scale-100'}`}
               />
             </div>
           </a>
         </div>
 
-        {/* Desktop Menu - Absolutely Centered & Highest Z-Index (z-[80]) for 100% Clickability */}
-        <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center space-x-4 lg:space-x-6 z-[80] pointer-events-auto">
-          {navLinks.map((item, i) => {
-            const isDropdownActive =
-              (item === "Property Services" && isServicesHovered) ||
-              (item === "Buy" && isBuyHovered) ||
-              (item === "Rent" && isRentHovered && isRentHasDropdown);
-
-            return (
-              <motion.div
-                key={item}
-                className="relative hum-intro-item"
-                style={{ "--i": i + 1 } as React.CSSProperties}
-                onMouseEnter={() => {
-                  if (item === "Property Services") setIsServicesHovered(true);
-                  if (item === "Buy") setIsBuyHovered(true);
-                  if (item === "Rent" && isRentHasDropdown) setIsRentHovered(true);
-                }}
-                onMouseLeave={() => {
-                  if (item === "Property Services") setIsServicesHovered(false);
-                  if (item === "Buy") setIsBuyHovered(false);
-                  if (item === "Rent") setIsRentHovered(false);
-                }}
-              >
-                <Link
-                  href={
-                    item === "Buy"
-                      ? "/buy"
-                      : item === "Rent"
-                        ? "/rent"
-                        : item === "About" 
-                        ? "/about" 
-                        : item === "Insights"
-                          ? "/blogs"
-                          : item === "Sell"
-                            ? "/sell"
-                            : item === "Property Services" 
-                              ? "/services" 
-                              : item === "Invest"
-                                ? "/invest"
-                                : item === "FAQs"
-                                  ? "/faq"
-                                  : `/#${item.toLowerCase().replace(" ", "-")}`
-                  }
-                  className={`group flex items-center space-x-1 whitespace-nowrap transition-all duration-200 cursor-pointer py-4 px-1.5 relative z-[80] ${
-                    isDropdownActive
-                      ? "font-bold text-brand-gold"
-                      : "font-medium hover:font-bold"
-                  } ${
-                    scrolled || isOpen
-                      ? isDropdownActive
-                        ? "text-brand-gold"
-                        : "text-white hover:text-brand-gold"
-                      : isDropdownActive
-                        ? "text-brand-gold"
-                        : "text-brand-black hover:text-brand-gold"
-                  }`}
-                >
-                  <span className="relative inline-flex items-center">
-                    {item}
-                    {/* Noticeable animated bottom gold accent line on hover */}
-                    <span
-                      className={`absolute -bottom-1 left-0 h-[2.5px] bg-brand-gold rounded-full transition-all duration-300 pointer-events-none ${
-                        isDropdownActive
-                          ? "w-full opacity-100"
-                          : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
-                      }`}
-                    />
-                  </span>
-                  {(item === "Property Services" || item === "Buy" || (item === "Rent" && isRentHasDropdown)) && (
-                    <svg
-                      className={`w-4 h-4 ml-1 transition-all duration-300 ${
-                        isDropdownActive
-                          ? "rotate-180 text-brand-gold stroke-[2.5]"
-                          : "opacity-70 group-hover:opacity-100 group-hover:text-brand-gold group-hover:stroke-[2.5]"
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </Link>
-
-              {/* Desktop Dropdown Menu for Property Services */}
-              {item === "Property Services" && (
-                <AnimatePresence>
-                  {isServicesHovered && (
-                    <motion.div
-                      variants={dropdownVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      className="absolute top-full left-1/2 pt-2"
-                    >
-                      <div className="w-[280px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
-                        <div className="flex flex-col space-y-4">
-                          {visibleSubServices.map((sub, idx) => (
-                            <Link 
-                              key={sub.title}
-                              href={sub.href}
-                              className="group flex items-center space-x-2 py-2"
-                            >
-                              <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
-                              <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
-                                {sub.title}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
-                          <Link href="/services" className="text-xs font-bold text-brand-gold uppercase tracking-widest hover:text-brand-black transition-colors">
-                            View All Services
-                          </Link>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
-
-              {/* Desktop Dropdown Menu for Buy */}
-              {item === "Buy" && visibleBuyCategories.length > 0 && (
-                <AnimatePresence>
-                  {isBuyHovered && (
-                    <motion.div
-                      variants={dropdownVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      className="absolute top-full left-1/2 pt-2"
-                    >
-                      <div className="w-[320px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
-                        <div className="flex flex-col space-y-4">
-                          {visibleBuyCategories.map((sub, idx) => {
-                            if (sub.isClickable === false) {
-                              return (
-                                <div 
-                                  key={sub.id || sub.title}
-                                  className="flex items-center space-x-2 py-2 cursor-default select-none pointer-events-none"
-                                >
-                                  <div className="w-1.5 h-1.5 rounded-full bg-brand-gold" />
-                                  <span className="text-sm font-semibold text-brand-black tracking-wide">
-                                    {sub.title}
-                                  </span>
-                                </div>
-                              );
-                            }
-                            return (
-                              <Link 
-                                key={sub.title}
-                                href={sub.href}
-                                className="group flex items-center space-x-2 py-2"
-                              >
-                                <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
-                                  {sub.title}
-                                </span>
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
-
-              {/* Desktop Dropdown Menu for Rent */}
-              {item === "Rent" && visibleRentCategories.length > 0 && (
-                <AnimatePresence>
-                  {isRentHovered && (
-                    <motion.div
-                      variants={dropdownVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      className="absolute top-full left-1/2 pt-2"
-                    >
-                      <div className="w-[320px] bg-white border border-gray-200 rounded-2xl overflow-hidden p-6 shadow-none">
-                        <div className="flex flex-col space-y-4">
-                          {visibleRentCategories.map((sub, idx) => (
-                            <Link 
-                              key={sub.title}
-                              href={sub.href}
-                              className="group flex items-center space-x-2 py-2"
-                            >
-                              <div className="w-1.5 h-1.5 rounded-full bg-brand-gold/30 group-hover:bg-brand-gold group-hover:scale-125 transition-all duration-300" />
-                              <span className="text-sm font-medium text-gray-700 group-hover:text-brand-black group-hover:font-bold transition-all duration-200">
-                                {sub.title}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
-            </motion.div>
-          );
-        })}
-        </div>
 
         {/* Desktop Right CTA Button - flex-none ml-auto so it never stretches over center menu */}
+        <div className="hidden lg:flex items-center justify-end gap-3 xl:gap-6">
+        {navLinks.slice(leftCount).map((item, i) => renderNavItem(item, i + leftCount))}
         <div
-          className="hidden md:flex flex-none ml-auto justify-end items-center space-x-4 relative z-[60] hum-intro-item"
+          className="flex flex-none justify-end items-center space-x-4 relative z-[60] hum-intro-item ml-2 xl:ml-4"
           style={{ "--i": navLinks.length + 2 } as React.CSSProperties}
         >
           
@@ -448,7 +464,7 @@ export default function Navbar() {
             <button
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
               className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-300 ${
-                scrolled || isOpen
+                dark
                   ? "border-gray-600/50 text-white hover:border-brand-gold hover:text-brand-gold bg-black/20"
                   : "border-gray-200 text-brand-black hover:border-brand-gold hover:text-brand-gold bg-gray-50 hover:bg-white"
               }`}
@@ -492,8 +508,8 @@ export default function Navbar() {
           {!isPageHidden("contact") && (
             <Link
               href="/contact"
-              className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 border ${
-                scrolled || isOpen
+              className={`px-6 py-2.5 font-luxe font-semibold uppercase text-xs tracking-[0.2em] transition-all duration-300 border ${
+                dark
                   ? "bg-brand-gold text-brand-black border-brand-gold hover:bg-white hover:border-white"
                   : "bg-brand-black text-white border-brand-black hover:bg-brand-gold hover:text-brand-black hover:border-brand-gold"
               }`}
@@ -503,14 +519,16 @@ export default function Navbar() {
           )}
         </div>
 
+        </div>
+
         {/* Mobile Menu Button */}
         <div
-          className="flex-1 flex justify-end md:hidden relative z-[60] hum-intro-item"
+          className="flex-1 flex justify-end lg:hidden relative z-[60] hum-intro-item"
           style={{ "--i": 2 } as React.CSSProperties}
         >
           <button 
             className={`w-10 h-10 flex flex-col justify-center items-center transition-colors ${
-              isOpen ? "text-white" : scrolled ? "text-white" : "text-brand-black"
+              dark ? "text-white" : "text-brand-black"
             }`}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
@@ -539,7 +557,7 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 h-[100dvh] w-full bg-black/95 backdrop-blur-2xl z-40 flex flex-col md:hidden overflow-y-auto"
+            className="fixed inset-0 h-[100dvh] w-full bg-black/95 backdrop-blur-2xl z-40 flex flex-col lg:hidden overflow-y-auto"
           >
             {/* Top spacer to account for the navbar */}
             <div className="h-28 flex-none"></div>
@@ -661,7 +679,7 @@ export default function Navbar() {
                   {!isPageHidden("contact") && (
                     <Link
                       href="/contact"
-                      className="inline-flex items-center justify-center w-full bg-brand-gold hover:bg-white text-brand-black px-6 py-3.5 rounded-full font-semibold transition-all text-base sm:text-lg"
+                      className="inline-flex items-center justify-center w-full bg-brand-gold hover:bg-white text-brand-black px-6 py-3.5 font-luxe font-semibold uppercase tracking-[0.2em] transition-all text-sm sm:text-base"
                       onClick={() => setIsOpen(false)}
                     >
                       Contact an Agent
