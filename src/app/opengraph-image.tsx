@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 
-export const alt = 'Mohd. Alfalasi Real Estate - Luxury Properties in Dubai'
+export const alt = 'HUM Properties - Luxury Properties in Dubai'
 export const size = {
   width: 1200,
   height: 630,
@@ -84,7 +84,7 @@ export default async function Image() {
               lineHeight: 1.2,
             }}
           >
-            Mohd. Alfalasi Real Estate
+            HUM Properties
           </h1>
           <p
             style={{
