@@ -72,6 +72,7 @@ export default function PhotoRing({ images, activeIndex, onFrontChange, controls
         d.style.width = `${cw}px`;
         d.style.height = `${ch}px`;
         d.style.transform = `translate(-50%,-50%) translate(${Math.sin(a) * rx}px,${-(1 - depth) * ry}px) scale(${s})`;
+        // Stacking stays inside the ring (the stage is "isolate"), so the full-screen viewer covers it
         d.style.zIndex = String(Math.round(depth * 100));
         d.style.filter = `brightness(${0.7 + 0.3 * depth})`;
         if (depth > best) {
@@ -171,7 +172,7 @@ export default function PhotoRing({ images, activeIndex, onFrontChange, controls
   return (
     <div
       ref={stageRef}
-      className="relative h-[130px] sm:h-[180px] lg:h-[190px] mt-2 overflow-hidden px-1 cursor-grab active:cursor-grabbing select-none touch-pan-y"
+      className="relative isolate h-[130px] sm:h-[180px] lg:h-[190px] mt-2 overflow-hidden px-1 cursor-grab active:cursor-grabbing select-none touch-pan-y"
       aria-label="Photo gallery, drag to turn"
     >
       {images.map((src, i) => (
