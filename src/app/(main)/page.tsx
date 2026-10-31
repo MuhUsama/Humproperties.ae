@@ -16,7 +16,7 @@ import { getFaqsByCategory } from '@/lib/faqData';
 export default function Home() {
   const homeFaqs = getFaqsByCategory('general');
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-20 overflow-x-hidden">
+    <main className="min-h-screen bg-[#faf9f7] overflow-x-hidden">
       {/* Hero section is loaded immediately for fast LCP (Largest Contentful Paint) */}
       <HeroSection />
       
