@@ -257,7 +257,7 @@ export default function Navbar() {
                             ? "/faq"
                             : `/#${item.toLowerCase().replace(" ", "-")}`
             }
-            className={`group flex items-center space-x-1 whitespace-nowrap uppercase text-[11px] xl:text-xs tracking-[0.16em] transition-all duration-200 cursor-pointer py-4 px-1 relative z-[80] ${
+            className={`group flex items-center space-x-1 whitespace-nowrap font-luxe font-medium uppercase text-[11px] xl:text-[13px] tracking-[0.14em] transition-all duration-200 cursor-pointer py-4 px-1 relative z-[80] ${
               isDropdownActive
                 ? "font-bold text-brand-gold"
                 : "font-medium hover:font-bold"
@@ -508,7 +508,7 @@ export default function Navbar() {
           {!isPageHidden("contact") && (
             <Link
               href="/contact"
-              className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 border ${
+              className={`px-6 py-2.5 font-luxe font-semibold uppercase text-xs tracking-[0.2em] transition-all duration-300 border ${
                 dark
                   ? "bg-brand-gold text-brand-black border-brand-gold hover:bg-white hover:border-white"
                   : "bg-brand-black text-white border-brand-black hover:bg-brand-gold hover:text-brand-black hover:border-brand-gold"
@@ -679,7 +679,7 @@ export default function Navbar() {
                   {!isPageHidden("contact") && (
                     <Link
                       href="/contact"
-                      className="inline-flex items-center justify-center w-full bg-brand-gold hover:bg-white text-brand-black px-6 py-3.5 rounded-full font-semibold transition-all text-base sm:text-lg"
+                      className="inline-flex items-center justify-center w-full bg-brand-gold hover:bg-white text-brand-black px-6 py-3.5 font-luxe font-semibold uppercase tracking-[0.2em] transition-all text-sm sm:text-base"
                       onClick={() => setIsOpen(false)}
                     >
                       Contact an Agent

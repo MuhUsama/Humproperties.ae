@@ -20,6 +20,8 @@ const config: Config = {
         sans: ["var(--font-montserrat)", "sans-serif"],
         serif: ["var(--font-cormorant)", "serif"],
         heading: ["var(--font-cormorant)", "serif"],
+        display: ["var(--font-bodoni)", "serif"],
+        luxe: ["var(--font-cinzel)", "serif"],
       },
       keyframes: {
         fadeInUp: {

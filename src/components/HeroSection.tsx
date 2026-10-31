@@ -56,12 +56,12 @@ const HeroSection = memo(function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: ready ? 1 : 0 }}
           transition={{ duration: 1.2 }}
-          className="text-[10px] md:text-xs uppercase tracking-[0.5em] pl-[0.5em] text-white/75 mb-6 md:mb-8"
+          className="font-luxe text-[10px] md:text-xs uppercase tracking-[0.5em] pl-[0.5em] text-white/75 mb-6 md:mb-8"
         >
           Dubai · Luxury Real Estate
         </motion.p>
 
-        <h1 className="font-serif font-light leading-[1.02] text-[2.6rem] sm:text-6xl md:text-7xl lg:text-[6.2rem] max-w-6xl min-h-[3.15em] sm:min-h-[2.1em]">
+        <h1 className="font-display font-normal leading-[1.05] tracking-[-0.01em] text-[2.4rem] sm:text-6xl md:text-7xl lg:text-[5.6rem] max-w-6xl min-h-[3.15em] sm:min-h-[2.1em]">
           <AnimatePresence mode="wait">
             {ready && (
               <motion.span key={line} className="block" exit={{ opacity: 0, y: -24, filter: "blur(6px)" }} transition={{ duration: 0.6, ease }}>
@@ -86,10 +86,10 @@ const HeroSection = memo(function HeroSection() {
           transition={{ duration: 1, ease, delay: 0.5 }}
           className="mt-8 md:mt-10 flex items-center gap-7"
         >
-          <Link href="/buy" className="text-[11px] uppercase tracking-[0.28em] font-medium bg-white text-brand-black px-7 py-3.5 hover:bg-brand-gold hover:text-white transition-colors">
+          <Link href="/buy" className="font-luxe text-xs uppercase tracking-[0.24em] font-medium bg-white text-brand-black px-7 py-3.5 hover:bg-brand-gold hover:text-white transition-colors">
             Explore properties
           </Link>
-          <Link href="#contact" className="hidden sm:inline text-[11px] uppercase tracking-[0.28em] font-medium border-b border-white/50 pb-1 hover:text-brand-gold hover:border-brand-gold transition-colors">
+          <Link href="#contact" className="hidden sm:inline font-luxe text-xs uppercase tracking-[0.24em] font-medium border-b border-white/50 pb-1 hover:text-brand-gold hover:border-brand-gold transition-colors">
             Contact an agent
           </Link>
         </motion.div>
