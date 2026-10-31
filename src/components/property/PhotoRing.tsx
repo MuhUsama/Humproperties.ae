@@ -39,6 +39,12 @@ export default function PhotoRing({ images, activeIndex, onFrontChange, controls
     const el = stageRef.current;
     if (!el || n === 0) return;
     const step = 360 / n;
+    // Today's ring size is the maximum, used from 10 photos up. With fewer photos the ring
+    // shrinks so the photos beside the front one tuck slightly behind it, with no empty gap.
+    const FULL_RING = 10;
+    const sideDepth = (Math.cos((2 * Math.PI) / n) + 1) / 2;
+    const sideScale = 0.5 + 0.5 * Math.pow(sideDepth, 1.6);
+    const snugRadius = (cardW: number) => (cardW * (0.5 + sideScale / 2) - cardW * 0.08) / Math.sin((2 * Math.PI) / n);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let rot = frontRef.current * step;
     let target = rot;
@@ -53,7 +59,8 @@ export default function PhotoRing({ images, activeIndex, onFrontChange, controls
       const mobile = W < 640;
       const cw = mobile ? W * 0.4 : Math.min(W * 0.22, 240);
       const ch = cw * 0.62;
-      const rx = mobile ? W * 0.3 : W * 0.4;
+      const maxRx = mobile ? W * 0.3 : W * 0.4;
+      const rx = n >= FULL_RING ? maxRx : Math.min(maxRx, snugRadius(cw));
       const ry = H * 0.22;
       let best = -1;
       let bi = 0;
