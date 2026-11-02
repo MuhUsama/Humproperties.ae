@@ -156,11 +156,11 @@ function RentContent() {
   const rentFaqs = getFaqsByCategory('rent');
 
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-20 pb-20">
+    <main className="min-h-screen bg-[#faf9f7] pb-20">
 
       {/* Hero Banner Area */}
-      <section className="relative w-full p-5 md:p-10 lg:p-12 flex flex-col items-center justify-center h-[calc(100svh-5rem)]">
-        <div className="relative w-full flex-1 min-h-[440px] rounded-[2rem] md:rounded-[2.5rem] bg-black isolate transform-gpu overflow-hidden flex items-center justify-center text-center shadow-none group px-6 py-12 md:px-24 md:py-20 animate-[fadeInUp_0.8s_ease-out_forwards]">
+      <section className="relative w-full flex flex-col h-[100svh] min-h-[560px]">
+        <div className="relative w-full flex-1 min-h-[440px] bg-black isolate transform-gpu overflow-hidden flex items-center justify-center text-center shadow-none group px-6 pt-28 pb-12 md:px-24 md:pt-32 md:pb-20 animate-[fadeInUp_0.8s_ease-out_forwards]">
           <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/20 to-transparent opacity-50 z-0"></div>
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none z-0"></div>
           

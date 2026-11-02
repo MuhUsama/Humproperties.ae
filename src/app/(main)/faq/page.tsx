@@ -77,7 +77,7 @@ export default function FAQPage() {
   };
 
   return (
-    <main className="w-full bg-[#faf9f7] pt-20 min-h-screen flex flex-col">
+    <main className="w-full bg-[#faf9f7] min-h-screen flex flex-col">
       {/* Inject SEO Schema */}
       <script
         type="application/ld+json"
@@ -85,7 +85,7 @@ export default function FAQPage() {
       />
       
       {/* Hero Section */}
-      <section className="w-full py-12 md:py-20 px-6 lg:px-12 bg-brand-black text-white text-center">
+      <section className="w-full h-[100svh] min-h-[560px] flex items-center justify-center pt-28 pb-16 md:pt-32 px-6 lg:px-12 bg-brand-black text-white text-center">
         <motion.div 
           variants={staggerContainer}
           initial="hidden"

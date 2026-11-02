@@ -262,7 +262,7 @@ export default function DevelopersManagementPage() {
   };
 
   const handleDelete = async (dev: Developer) => {
-    if (!confirm(`Remove ${dev.name}? Their listings stay on the site but are no longer linked to a developer.`)) return;
+    if (!confirm(`Remove ${dev.name}? Their projects are removed too. Their listings stay on the site but are no longer linked to a developer or project.`)) return;
 
     try {
       const res = await fetch(`/api/developers/${dev.id}`, { method: "DELETE" });

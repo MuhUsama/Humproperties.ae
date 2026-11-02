@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Globe } from "lucide-react";
 import OffPlanListingCard from "@/components/offplan/OffPlanListingCard";
+import { OffPlanProject, ProjectShowcase, projectHref } from "@/components/offplan/projects";
 
 export default function DeveloperPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -41,15 +42,23 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  const listings: any[] = developer.listings || [];
+  const allListings: any[] = developer.listings || [];
+  const projects: OffPlanProject[] = developer.projects || [];
+  const projectIds = new Set(projects.map((p) => p.id));
+  const countByProject: Record<string, number> = {};
+  allListings.forEach((l) => {
+    if (l.projectId) countByProject[l.projectId] = (countByProject[l.projectId] || 0) + 1;
+  });
+  // Properties of this developer that are not inside one of its projects still show, below the projects
+  const listings = allListings.filter((l) => !l.projectId || !projectIds.has(l.projectId));
   const devSummary = { id: developer.id, name: developer.name, slug: developer.slug, logo: developer.logo };
 
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-20 pb-20">
+    <main className="min-h-screen bg-[#faf9f7] pb-20">
 
-      {/* Hero */}
-      <section className="relative w-full p-5 md:p-10 lg:p-12">
-        <div className="relative w-full min-h-[420px] md:min-h-[480px] rounded-[2rem] md:rounded-[2.5rem] bg-black isolate transform-gpu overflow-hidden flex items-end">
+      {/* Hero, full screen */}
+      <section className="relative w-full">
+        <div className="relative w-full h-[100svh] min-h-[560px] bg-black isolate transform-gpu overflow-hidden flex items-end">
           {developer.coverImage ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -63,7 +72,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
             </>
           )}
 
-          <Link href="/off-plan" className="absolute top-6 left-6 md:top-8 md:left-10 z-20 flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors">
+          <Link href="/off-plan" className="absolute top-28 left-6 md:top-32 md:left-12 z-20 flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors">
             <ArrowLeft className="w-4 h-4" /> All Developers
           </Link>
 
@@ -81,7 +90,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d4af37]">Off Plan Developer</span>
               <h1 className="text-4xl md:text-7xl font-serif uppercase tracking-[0.15em] text-white mt-2">{developer.name}</h1>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 text-sm text-gray-300">
-                <span>{listings.length} {listings.length === 1 ? "Project" : "Projects"} Available</span>
+                {projects.length > 0 && <span>{projects.length} {projects.length === 1 ? "Project" : "Projects"}</span>}
                 {developer.website && (
                   <a href={developer.website} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
                     <Globe className="w-4 h-4" /> Official Website
@@ -108,27 +117,58 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
         </section>
       )}
 
-      {/* Projects */}
-      <section className="w-full mx-auto px-6 lg:px-12 pt-16 md:pt-20">
-        <h2 className="text-3xl md:text-4xl font-serif text-brand-black mb-8">
-          Projects by {developer.name}
-        </h2>
-        {listings.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
-            <h3 className="text-2xl font-serif text-brand-black mb-2">New Launches Coming Soon</h3>
-            <p className="text-gray-500 mb-6">Contact us for early access to upcoming {developer.name} projects.</p>
-            <Link href="/contact" className="px-6 py-3 bg-brand-gold text-white rounded-full font-medium hover:bg-brand-black transition-colors">
-              Register Interest
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {listings.map((prop, idx) => (
-              <OffPlanListingCard key={prop.id} property={prop} developer={devSummary} index={idx} />
+      {/* Projects, one after another */}
+      {projects.length > 0 && (
+        <section className="w-full pt-16 md:pt-20">
+          <h2 className="px-6 lg:px-12 text-3xl md:text-4xl font-serif text-brand-black mb-8">
+            Projects by {developer.name}
+          </h2>
+          <div>
+            {projects.map((project, i) => (
+              <div key={project.id} id={project.slug} className="scroll-mt-24">
+                <ProjectShowcase
+                  project={project}
+                  propertiesHref={projectHref(developer.slug, project)}
+                  propertyCount={countByProject[project.id]}
+                />
+                {i < projects.length - 1 && (
+                  // Gold double rule between projects, as on the Reportage offer pages
+                  <div className="bg-[#1c1c1c] px-6 pt-4 pb-12 md:pb-16" aria-hidden="true">
+                    <div className="max-w-3xl mx-auto">
+                      <div className="h-[5px] bg-brand-gold" />
+                      <div className="h-px bg-brand-gold mt-[5px]" />
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
+
+      {/* Properties not inside a project */}
+      {(listings.length > 0 || projects.length === 0) && (
+        <section className="w-full mx-auto px-6 lg:px-12 pt-16 md:pt-20">
+          <h2 className="text-3xl md:text-4xl font-serif text-brand-black mb-8">
+            {projects.length > 0 ? `More properties by ${developer.name}` : `Projects by ${developer.name}`}
+          </h2>
+          {listings.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
+              <h3 className="text-2xl font-serif text-brand-black mb-2">New Launches Coming Soon</h3>
+              <p className="text-gray-500 mb-6">Contact us for early access to upcoming {developer.name} projects.</p>
+              <Link href="/contact" className="px-6 py-3 bg-brand-gold text-white rounded-full font-medium hover:bg-brand-black transition-colors">
+                Register Interest
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {listings.map((prop, idx) => (
+                <OffPlanListingCard key={prop.id} property={prop} developer={devSummary} index={idx} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </main>
   );
 }

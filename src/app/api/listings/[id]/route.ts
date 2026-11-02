@@ -98,6 +98,7 @@ export async function PUT(request: Request, context: any) {
         image: body.image,
         status: body.status,
         developerId: body.developerId !== undefined ? body.developerId || null : undefined,
+        projectId: body.projectId !== undefined ? body.projectId || null : undefined,
         galleryImages: Array.isArray(body.galleryImages) ? body.galleryImages : undefined,
         description: body.description,
         features: Array.isArray(body.features) ? body.features : undefined,
