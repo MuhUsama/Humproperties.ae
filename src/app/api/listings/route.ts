@@ -40,6 +40,7 @@ export async function POST(request: Request) {
         image: body.image || "",
         status: body.status || "FOR SALE",
         developerId: body.developerId || null,
+        projectId: body.projectId || null,
         galleryImages: Array.isArray(body.galleryImages) ? body.galleryImages : [],
         description: body.description || null,
         features: Array.isArray(body.features) ? body.features : [],

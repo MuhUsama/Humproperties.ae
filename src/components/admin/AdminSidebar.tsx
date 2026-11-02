@@ -22,7 +22,8 @@ import {
   Loader2,
   MessageSquare,
   Construction,
-  Building2
+  Building2,
+  FolderKanban
 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -34,6 +35,7 @@ const navItems = [
   { name: "Add Industrial", href: "/admin/add-listing/industrial", icon: Factory },
   { name: "All Listings", href: "/admin/listings", icon: ListIcon },
   { name: "Off Plan Developers", href: "/admin/developers", icon: Building2 },
+  { name: "Off Plan Projects", href: "/admin/projects", icon: FolderKanban },
   { name: "Client Leads", href: "/admin/leads", icon: MessageSquare },
   { name: "Site Pages", href: "/admin/pages", icon: Layers },
   { name: "Under Construction", href: "/admin/under-construction", icon: Construction },

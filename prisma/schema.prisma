@@ -21,6 +21,7 @@ model Listing {
   image        String
   status       String   @default("FOR SALE")
   developerId  String?
+  projectId    String?
   galleryImages String[] @default([])
   description  String?
   features     String[] @default([])
@@ -52,6 +53,27 @@ model Developer {
   isVisible   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// An off plan project (e.g. "Verdana Apartments") by one developer. Off plan listings belong to a project.
+model OffPlanProject {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  slug          String   @unique
+  developerId   String
+  coverImage    String?
+  galleryImages String[] @default([])
+  location      String?
+  propertyTypes String?
+  bedrooms      String?
+  startingPrice String?
+  handover      String?
+  discount      String?
+  description   String?
+  order         Int      @default(0)
+  isVisible     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model ContactMessage {
