@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import ProjectRing from "@/components/offplan/ProjectRing";
 
 export type OffPlanProject = {
   id: string;
@@ -173,106 +174,6 @@ export function ProjectStats({ project, dark = false }: { project: OffPlanProjec
   );
 }
 
-// Coverflow-style photo slider: the middle photo is large, its neighbours smaller and faded. Click opens a lightbox.
-export function ProjectGallery({ images, name }: { images: string[]; name: string }) {
-  const [active, setActive] = useState(0);
-  const [lightbox, setLightbox] = useState<number | null>(null);
-  const count = images.length;
-
-  useEffect(() => {
-    if (lightbox === null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightbox(null);
-      if (e.key === "ArrowRight") setLightbox((i) => (i === null ? i : (i + 1) % count));
-      if (e.key === "ArrowLeft") setLightbox((i) => (i === null ? i : (i - 1 + count) % count));
-    };
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "unset";
-    };
-  }, [lightbox, count]);
-
-  if (!count) return null;
-
-  const offsetOf = (i: number) => {
-    let d = i - active;
-    if (d > count / 2) d -= count;
-    if (d < -count / 2) d += count;
-    return d;
-  };
-
-  return (
-    <div className="relative">
-      <div className="relative h-[220px] sm:h-[300px] md:h-[380px] overflow-hidden">
-        {images.map((src, i) => {
-          const d = offsetOf(i);
-          const abs = Math.abs(d);
-          if (abs > 2) return null;
-          const scale = abs === 0 ? 1 : abs === 1 ? 0.78 : 0.6;
-          const shift = d * (abs === 1 ? 52 : 46);
-          return (
-            <button
-              key={src + i}
-              onClick={() => (d === 0 ? setLightbox(i) : setActive(i))}
-              aria-label={d === 0 ? `Open photo ${i + 1} of ${name}` : `Show photo ${i + 1}`}
-              className="absolute left-1/2 top-1/2 w-[70%] sm:w-[52%] md:w-[42%] aspect-[3/2] transition-all duration-500 ease-out"
-              style={{
-                transform: `translate(-50%, -50%) translateX(${shift}%) scale(${scale})`,
-                zIndex: 10 - abs,
-                opacity: abs === 0 ? 1 : abs === 1 ? 0.75 : 0.4,
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`${name} photo ${i + 1}`} className="w-full h-full object-cover shadow-2xl" />
-            </button>
-          );
-        })}
-      </div>
-      {count > 1 && (
-        <div className="flex justify-center items-center gap-6 mt-4">
-          <button onClick={() => setActive((active - 1 + count) % count)} aria-label="Previous photo" className="w-10 h-10 flex items-center justify-center border border-brand-gold/60 text-brand-gold hover:bg-brand-gold hover:text-brand-black transition-colors">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-xs tracking-[0.2em] text-gray-400">{active + 1} / {count}</span>
-          <button onClick={() => setActive((active + 1) % count)} aria-label="Next photo" className="w-10 h-10 flex items-center justify-center border border-brand-gold/60 text-brand-gold hover:bg-brand-gold hover:text-brand-black transition-colors">
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      )}
-
-      {lightbox !== null && (
-        <div className="fixed inset-0 z-[80] bg-black/95 flex items-center justify-center" onClick={() => setLightbox(null)}>
-          <button onClick={() => setLightbox(null)} aria-label="Close" className="absolute top-5 right-5 text-white/80 hover:text-white p-2">
-            <X className="w-7 h-7" />
-          </button>
-          {count > 1 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + count) % count); }}
-              aria-label="Previous photo"
-              className="absolute left-3 md:left-8 text-white/80 hover:text-white p-2"
-            >
-              <ChevronLeft className="w-9 h-9" />
-            </button>
-          )}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[lightbox]} alt={`${name} photo ${lightbox + 1}`} className="max-w-[90vw] max-h-[85vh] object-contain" onClick={(e) => e.stopPropagation()} />
-          {count > 1 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % count); }}
-              aria-label="Next photo"
-              className="absolute right-3 md:right-8 text-white/80 hover:text-white p-2"
-            >
-              <ChevronRight className="w-9 h-9" />
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // One project presented like a launch offer page: big photo, gold title, key figures, description,
 // buttons and a photo slider. Used on the developer page (one per project) and at the top of the project page.
 export function ProjectShowcase({
@@ -280,31 +181,48 @@ export function ProjectShowcase({
   propertiesHref,
   propertyCount,
   headingLevel = "h2",
+  topLeft,
 }: {
   project: OffPlanProject;
   propertiesHref?: string;
   propertyCount?: number;
   headingLevel?: "h1" | "h2";
+  /** Shown over the top-left of the full-screen photo, e.g. a breadcrumb */
+  topLeft?: React.ReactNode;
 }) {
   const Heading = headingLevel;
   const gallery = (project.galleryImages || []).filter(Boolean);
 
   return (
     <article className="bg-[#1c1c1c] text-white">
-      {project.coverImage && (
-        <div className="relative w-full h-[260px] sm:h-[380px] md:h-[520px] overflow-hidden">
+      {project.coverImage ? (
+        // Full-screen landing photo with the project name over it
+        <div className="relative w-full h-[100svh] min-h-[520px] overflow-hidden flex items-end">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#1c1c1c] to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1c] via-black/25 to-black/40" />
+          {topLeft && <div className="absolute top-28 md:top-32 left-6 lg:left-12 z-10">{topLeft}</div>}
+          <div className="relative z-10 w-full px-6 lg:px-12 pb-14 md:pb-20 text-center">
+            {project.location && (
+              <p className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.3em] text-white/80 mb-3">{project.location}</p>
+            )}
+            <Heading className="font-serif text-4xl md:text-7xl text-brand-gold tracking-[0.04em] leading-tight">
+              {project.name}
+            </Heading>
+          </div>
         </div>
+      ) : (
+        topLeft && <div className="px-6 lg:px-12 pt-28 md:pt-32">{topLeft}</div>
       )}
 
       <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 py-10 md:py-14 text-center">
-        <Heading className="font-serif text-3xl md:text-5xl text-brand-gold tracking-[0.04em] leading-tight">
-          {project.name}
-        </Heading>
+        {!project.coverImage && (
+          <Heading className="font-serif text-3xl md:text-5xl text-brand-gold tracking-[0.04em] leading-tight">
+            {project.name}
+          </Heading>
+        )}
 
-        <div className="mt-8">
+        <div className={project.coverImage ? "" : "mt-8"}>
           <ProjectStats project={project} dark />
         </div>
 
@@ -339,7 +257,7 @@ export function ProjectShowcase({
 
       {gallery.length > 0 && (
         <div className="pb-12 md:pb-16">
-          <ProjectGallery images={gallery} name={project.name} />
+          <ProjectRing images={gallery} name={project.name} />
         </div>
       )}
     </article>

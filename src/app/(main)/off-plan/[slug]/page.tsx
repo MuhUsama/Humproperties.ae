@@ -54,11 +54,11 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
   const devSummary = { id: developer.id, name: developer.name, slug: developer.slug, logo: developer.logo };
 
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-20 pb-20">
+    <main className="min-h-screen bg-[#faf9f7] pb-20">
 
-      {/* Hero */}
-      <section className="relative w-full p-5 md:p-10 lg:p-12">
-        <div className="relative w-full min-h-[420px] md:min-h-[480px] rounded-[2rem] md:rounded-[2.5rem] bg-black isolate transform-gpu overflow-hidden flex items-end">
+      {/* Hero, full screen */}
+      <section className="relative w-full">
+        <div className="relative w-full h-[100svh] min-h-[560px] bg-black isolate transform-gpu overflow-hidden flex items-end">
           {developer.coverImage ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -72,7 +72,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
             </>
           )}
 
-          <Link href="/off-plan" className="absolute top-6 left-6 md:top-8 md:left-10 z-20 flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors">
+          <Link href="/off-plan" className="absolute top-28 left-6 md:top-32 md:left-12 z-20 flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors">
             <ArrowLeft className="w-4 h-4" /> All Developers
           </Link>
 

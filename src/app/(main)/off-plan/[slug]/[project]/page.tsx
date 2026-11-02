@@ -46,19 +46,21 @@ export default function OffPlanProjectPage({ params }: { params: Promise<{ slug:
   const devSummary = { id: developer.id, name: developer.name, slug: developer.slug, logo: developer.logo };
 
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-24 md:pt-28 pb-20">
-      <nav className="w-full mx-auto px-6 lg:px-12 pb-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs uppercase tracking-[0.15em] text-gray-500">
-        <Link href={`/off-plan/${developer.slug}`} className="flex items-center gap-1.5 text-brand-black hover:text-brand-gold transition-colors mr-3">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </Link>
-        <Link href="/off-plan" className="hover:text-brand-black">Off Plan</Link>
-        <span>/</span>
-        <Link href={`/off-plan/${developer.slug}`} className="hover:text-brand-black">{developer.name}</Link>
-        <span>/</span>
-        <span className="text-brand-black">{project.name}</span>
-      </nav>
-
-      <ProjectShowcase project={project} headingLevel="h1" />
+    <main className="min-h-screen bg-[#faf9f7] pb-20">
+      <ProjectShowcase
+        project={project}
+        headingLevel="h1"
+        topLeft={
+          <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs uppercase tracking-[0.15em] text-white/70">
+            <Link href={`/off-plan/${developer.slug}`} className="flex items-center gap-1.5 text-white hover:text-brand-gold transition-colors mr-3">
+              <ArrowLeft className="w-4 h-4" /> Back
+            </Link>
+            <Link href="/off-plan" className="hover:text-white">Off Plan</Link>
+            <span>/</span>
+            <Link href={`/off-plan/${developer.slug}`} className="hover:text-white">{developer.name}</Link>
+          </nav>
+        }
+      />
 
       <section id="properties" className="w-full mx-auto px-6 lg:px-12 pt-14 md:pt-20 scroll-mt-24">
         <div className="text-center mb-8 md:mb-10">
