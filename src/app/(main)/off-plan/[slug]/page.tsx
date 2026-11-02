@@ -132,8 +132,12 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
                   propertyCount={countByProject[project.id]}
                 />
                 {i < projects.length - 1 && (
-                  <div className="bg-[#1c1c1c] px-6 lg:px-12">
-                    <div className="h-1.5 border-y border-brand-gold/50" />
+                  // Gold double rule between projects, as on the Reportage offer pages
+                  <div className="bg-[#1c1c1c] px-6 pt-4 pb-12 md:pb-16" aria-hidden="true">
+                    <div className="max-w-3xl mx-auto">
+                      <div className="h-[5px] bg-brand-gold" />
+                      <div className="h-px bg-brand-gold mt-[5px]" />
+                    </div>
                   </div>
                 )}
               </div>

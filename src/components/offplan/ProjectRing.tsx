@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-// Degrees per frame while turning on its own, and how long it rests after the visitor touches it
-const AUTO_SPEED = 0.08;
-const IDLE_MS = 3500;
+// It turns one photo at a time on its own, every AUTO_MS, and rests IDLE_MS after the visitor touches it
+const AUTO_MS = 3200;
+const IDLE_MS = 5000;
 
 /**
- * A large ring of project photos that keeps turning in a circle. Photos face the viewer and sit on
- * an ellipse: the front one is big and bright, the ones behind it smaller and darker. Drag or swipe
+ * A carousel ring of project photos, like the Reportage offer pages: the front photo is large and sits
+ * a little lower, its neighbours sit right beside it slightly smaller and higher, and the photos at the
+ * back only peek out above. It turns round one photo at a time. Drag or swipe
  * to turn it, use the arrows, or click a photo; clicking the front photo opens it full screen.
  */
 export default function ProjectRing({ images, name }: { images: string[]; name: string }) {
@@ -38,23 +39,29 @@ export default function ProjectRing({ images, name }: { images: string[]; name: 
       const W = el.clientWidth;
       const H = el.clientHeight;
       const mobile = W < 640;
-      const cw = mobile ? W * 0.62 : Math.min(W * 0.34, 560);
-      const ch = cw * 0.62;
-      // With few photos the ring is narrower so neighbours still tuck behind the front photo
-      const rx = Math.min(mobile ? W * 0.36 : W * 0.38, n <= 2 ? cw * 0.45 : n <= 4 ? cw * 0.75 : Infinity);
-      const ry = H * 0.44;
+      const cw = mobile ? W * 0.6 : Math.min(W * 0.32, 520);
+      const ch = cw * 0.6;
+      const sideScale = 0.5 + 0.5 * Math.pow((Math.cos((2 * Math.PI) / n) + 1) / 2, 3);
+      // Neighbours sit edge to edge with the front photo, but never past the edge of the screen
+      const besideFront = cw * (0.5 + sideScale / 2) - cw * 0.02;
+      const rx =
+        n <= 2
+          ? cw * 0.62
+          : Math.min(besideFront / Math.max(Math.sin((2 * Math.PI) / n), 0.5), Math.max(W / 2 - cw * sideScale * 0.45, besideFront));
+      const ry = ch * 0.32;
+      const cy = ch * 0.08;
       let best = -1;
       let bi = 0;
       itemRefs.current.forEach((d, i) => {
         if (!d) return;
         const a = ((i * step - rot) * Math.PI) / 180;
         const depth = (Math.cos(a) + 1) / 2;
-        const s = 0.45 + 0.55 * Math.pow(depth, 1.5);
+        const s = 0.5 + 0.5 * Math.pow(depth, 3);
         d.style.width = `${cw}px`;
         d.style.height = `${ch}px`;
-        d.style.transform = `translate(-50%,-50%) translate(${Math.sin(a) * rx}px,${(depth - 0.5) * ry}px) scale(${s})`;
+        d.style.transform = `translate(-50%,-50%) translate(${Math.sin(a) * rx}px,${cy - (1 - depth) * ry}px) scale(${s})`;
         d.style.zIndex = String(Math.round(depth * 100));
-        d.style.filter = `brightness(${0.45 + 0.55 * depth})`;
+        d.style.filter = `brightness(${0.35 + 0.65 * depth})`;
         if (depth > best) {
           best = depth;
           bi = i;
@@ -66,10 +73,15 @@ export default function ProjectRing({ images, name }: { images: string[]; name: 
       }
     };
 
+    let nextTurn = performance.now() + AUTO_MS;
     const tick = () => {
+      const now = performance.now();
       if (!drag) {
-        if (!reduce && visible && !document.hidden && performance.now() > idleUntil) target += AUTO_SPEED;
-        rot += (target - rot) * 0.08;
+        if (!reduce && visible && !document.hidden && now > idleUntil && now > nextTurn && n > 1) {
+          target = Math.round(target / step) * step + step;
+          nextTurn = now + AUTO_MS;
+        }
+        rot += (target - rot) * 0.06;
       }
       render();
       raf = requestAnimationFrame(tick);
@@ -160,7 +172,7 @@ export default function ProjectRing({ images, name }: { images: string[]; name: 
     <div className="relative">
       <div
         ref={stageRef}
-        className="relative isolate h-[300px] sm:h-[420px] md:h-[520px] lg:h-[580px] overflow-hidden cursor-grab active:cursor-grabbing select-none touch-pan-y"
+        className="relative isolate h-[230px] sm:h-[300px] md:h-[350px] lg:h-[380px] overflow-hidden cursor-grab active:cursor-grabbing select-none touch-pan-y"
         aria-label={`${name} photos, drag to turn`}
       >
         {images.map((src, i) => (
