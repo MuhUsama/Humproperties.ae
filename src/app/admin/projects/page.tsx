@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Loader2, Trash2, Plus, UploadCloud, X, Pencil, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Loader2, Trash2, Plus, UploadCloud, X, Pencil, Eye, EyeOff, ExternalLink, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 
 type Developer = { id: string; name: string; slug: string; logo: string };
@@ -59,7 +59,9 @@ export default function ProjectsManagementPage() {
   const [coverPreview, setCoverPreview] = useState("");
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
 
-  useEffect(() => {
+  const [samplesBusy, setSamplesBusy] = useState(false);
+
+  const loadAll = () =>
     Promise.all([
       fetch("/api/developers?all=true").then((r) => r.json()),
       fetch("/api/projects?all=true").then((r) => r.json()),
@@ -78,7 +80,52 @@ export default function ProjectsManagementPage() {
       })
       .catch((error) => console.error("Failed to load projects", error))
       .finally(() => setLoading(false));
+
+  useEffect(() => {
+    loadAll();
   }, []);
+
+  const hasSamples = projects.some((p) => p.slug.startsWith("sample-"));
+
+  const addSamples = async () => {
+    if (!confirm("Add sample projects with a few sample properties each, so you can see how the Off Plan pages look? You can remove them all again with \"Remove Samples\".")) return;
+    setSamplesBusy(true);
+    try {
+      const res = await fetch("/api/projects/samples", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.projectsAdded ? `Added ${data.projectsAdded} sample projects and ${data.listingsAdded} sample properties` : "Sample projects are already added");
+        await loadAll();
+      } else {
+        toast.error(data.error || "Failed to add samples");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred");
+    } finally {
+      setSamplesBusy(false);
+    }
+  };
+
+  const removeSamples = async () => {
+    if (!confirm("Remove all sample projects and their sample properties? Your own projects and properties are not touched.")) return;
+    setSamplesBusy(true);
+    try {
+      const res = await fetch("/api/projects/samples", { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Removed ${data.projectsRemoved} sample projects and ${data.listingsRemoved} sample properties`);
+        await loadAll();
+      } else {
+        toast.error(data.error || "Failed to remove samples");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred");
+    } finally {
+      setSamplesBusy(false);
+    }
+  };
 
   const developerById = useMemo(() => Object.fromEntries(developers.map((d) => [d.id, d])), [developers]);
 
@@ -233,6 +280,26 @@ export default function ProjectsManagementPage() {
             Projects shown under each developer on the Off Plan page. When you add an &quot;Off Plan&quot; property, you pick its project first.
           </p>
         </div>
+        <div className="flex flex-wrap gap-2 flex-shrink-0">
+        {hasSamples ? (
+          <button
+            onClick={removeSamples}
+            disabled={samplesBusy}
+            className="flex items-center justify-center gap-2 border border-red-200 text-red-600 px-4 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors"
+          >
+            {samplesBusy ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+            Remove Samples
+          </button>
+        ) : (
+          <button
+            onClick={addSamples}
+            disabled={samplesBusy || developers.length === 0}
+            className="flex items-center justify-center gap-2 border border-gray-300 text-brand-black px-4 py-2 rounded-lg font-semibold hover:border-brand-black transition-colors disabled:opacity-40"
+          >
+            {samplesBusy ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+            Add Sample Projects
+          </button>
+        )}
         <button
           onClick={() => (isFormOpen ? (setIsFormOpen(false), resetForm()) : openNew())}
           disabled={developers.length === 0}
@@ -241,6 +308,7 @@ export default function ProjectsManagementPage() {
           {isFormOpen ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {isFormOpen ? "Cancel" : "Add Project"}
         </button>
+        </div>
       </div>
 
       {developers.length === 0 && (
