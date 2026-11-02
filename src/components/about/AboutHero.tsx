@@ -6,10 +6,10 @@ import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const AboutHero = memo(function AboutHero() {
   return (
-    <section className="relative w-full p-5 md:p-10 lg:p-12 flex flex-col items-center justify-center h-[calc(100svh-5rem)]">
+    <section className="relative w-full flex flex-col h-[100svh] min-h-[560px]">
       {/* Exact Same Size, Margins, and Rounded Borders as Contact Hero Card */}
       <div 
-        className="relative w-full flex-1 min-h-[440px] rounded-[2rem] md:rounded-[2.5rem] bg-black isolate transform-gpu overflow-hidden flex items-center justify-center text-center shadow-none group px-6 py-10 md:px-24 md:py-20 animate-[fadeInUp_0.8s_ease-out_forwards]"
+        className="relative w-full flex-1 min-h-[440px] bg-black isolate transform-gpu overflow-hidden flex items-center justify-center text-center shadow-none group px-6 pt-28 pb-12 md:px-24 md:pt-32 md:pb-20 animate-[fadeInUp_0.8s_ease-out_forwards]"
       >
         {/* Static Image Background with Dark Overlay (Matching Contact Hero) */}
         <motion.div className="absolute inset-0 w-full h-full scale-105 group-hover:scale-100 transition-transform duration-[10s] ease-out z-0">

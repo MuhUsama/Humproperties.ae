@@ -89,9 +89,12 @@ export default function Navbar() {
   const [isMobileRentOpen, setIsMobileRentOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const pathname = usePathname();
-  // On the home page, and on off plan developer/project pages, the header sits transparent over the
-  // full-screen hero until the visitor scrolls
-  const fullScreenHero = pathname === "/" || /^\/off-plan\/[^/]+(\/[^/]+)?\/?$/.test(pathname || "");
+  // Pages that open with a full-screen hero: the header sits transparent over it until the visitor scrolls
+  const fullScreenHero =
+    /^\/(about|blogs|buy|rent|sell|services|invest|contact|faq)?\/?$/.test(pathname || "") ||
+    /^\/services\/[^/]+\/?$/.test(pathname || "") ||
+    /^\/properties\/category\/[^/]+\/?$/.test(pathname || "") ||
+    /^\/off-plan\/[^/]+(\/[^/]+)?\/?$/.test(pathname || "");
   const overHero = !scrolled && !isOpen && fullScreenHero;
   const dark = scrolled || isOpen || overHero;
 

@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-20 overflow-x-hidden selection:bg-[#d4af37] selection:text-[#101014]">
+    <main className="min-h-screen bg-[#faf9f7] overflow-x-hidden selection:bg-[#d4af37] selection:text-[#101014]">
       {/* 0. Luxury Cinematic Hero (Full Screen) */}
       <AboutHero />
 
