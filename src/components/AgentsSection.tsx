@@ -61,7 +61,7 @@ const AgentsSection = memo(function AgentsSection() {
             Our Team
           </motion.span>
           <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white leading-tight">
-            Meet Our Luxury Experts
+            Advisors Who Know Dubai
           </motion.h2>
         </motion.div>
         
