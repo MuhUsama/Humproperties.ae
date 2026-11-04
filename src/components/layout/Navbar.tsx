@@ -55,8 +55,6 @@ const subServices: SubPageItem[] = [
   { id: "services_relocation", title: "Relocation", href: "/services/relocation-services" },
   { id: "services_management", title: "Management", href: "/services/property-management" },
   { id: "services_brokerage", title: "Brokerage", href: "/services/property-brokerage" },
-  { id: "services_commercial", title: "Commercial", href: "/properties/category/commercial", propertyType: "Commercial" },
-  { id: "services_industrial", title: "Industrial", href: "/properties/category/industrial", propertyType: "Industrial" },
   { id: "services_interiordesign", title: "Interior Design", href: "/services/interior-design-and-fit-out" },
   { id: "services_development", title: "Development", href: "/services/real-estate-development" },
 ];
@@ -151,15 +149,9 @@ export default function Navbar() {
   const isRentHasDropdown = visibleRentCategories.length > 0;
 
   // Filter Services sub-pages
-  // (Commercial / Industrial only while a listing of that type exists)
   const visibleSubServices = useMemo(() => {
-    return subServices.filter((item) => {
-      if (isPageHidden(item.id)) return false;
-      if (!item.propertyType) return true;
-      const type = item.propertyType.toLowerCase();
-      return (liveListings || []).some((p) => (p.propertyType || "").toLowerCase() === type);
-    });
-  }, [liveListings, isPageHidden]);
+    return subServices.filter((item) => !isPageHidden(item.id));
+  }, [isPageHidden]);
 
   useEffect(() => {
     const handleScroll = () => {

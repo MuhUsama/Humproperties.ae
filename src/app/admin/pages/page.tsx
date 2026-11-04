@@ -172,7 +172,7 @@ const SITE_PAGES: SitePageConfig[] = [
     url: "/properties/category/commercial",
     group: "buy",
     category: "Buy Category",
-    description: "Commercial properties for sale. Shown in the Buy menu, Services menu and Services page.",
+    description: "Commercial properties for sale. Shown in the Buy menu and on the Services page.",
     icon: Building,
   },
   {
@@ -181,7 +181,7 @@ const SITE_PAGES: SitePageConfig[] = [
     url: "/properties/category/industrial",
     group: "buy",
     category: "Buy Category",
-    description: "Industrial properties for sale. Shown in the Buy menu, Services menu and Services page.",
+    description: "Industrial properties for sale. Shown in the Buy menu and on the Services page.",
     icon: Key,
   },
 
