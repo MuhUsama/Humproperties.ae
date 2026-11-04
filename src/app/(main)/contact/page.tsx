@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-20 flex flex-col selection:bg-brand-gold selection:text-brand-black">
+    <main className="min-h-screen bg-[#faf9f7] flex flex-col selection:bg-brand-gold selection:text-brand-black">
       {/* Luxury Cinematic Hero */}
       <ContactHero />
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Globe } from "lucide-react";
 import OffPlanListingCard from "@/components/offplan/OffPlanListingCard";
+import { OffPlanProject, ProjectShowcase, projectHref } from "@/components/offplan/projects";
 
 export default function DeveloperPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -41,20 +42,28 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  const listings: any[] = developer.listings || [];
+  const allListings: any[] = developer.listings || [];
+  const projects: OffPlanProject[] = developer.projects || [];
+  const projectIds = new Set(projects.map((p) => p.id));
+  const countByProject: Record<string, number> = {};
+  allListings.forEach((l) => {
+    if (l.projectId) countByProject[l.projectId] = (countByProject[l.projectId] || 0) + 1;
+  });
+  // Properties of this developer that are not inside one of its projects still show, below the projects
+  const listings = allListings.filter((l) => !l.projectId || !projectIds.has(l.projectId));
   const devSummary = { id: developer.id, name: developer.name, slug: developer.slug, logo: developer.logo };
 
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-20 pb-20">
+    <main className="min-h-screen bg-[#1c1c1c] text-white pb-20">
 
-      {/* Hero */}
-      <section className="relative w-full p-5 md:p-10 lg:p-12">
-        <div className="relative w-full min-h-[420px] md:min-h-[480px] rounded-[2rem] md:rounded-[2.5rem] bg-black isolate transform-gpu overflow-hidden flex items-end">
+      {/* Hero, full screen */}
+      <section className="relative w-full">
+        <div className="relative w-full h-[100svh] min-h-[560px] bg-black isolate transform-gpu overflow-hidden flex items-end">
           {developer.coverImage ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={developer.coverImage} alt={developer.name} className="absolute inset-0 w-full h-full object-cover grayscale z-0" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 z-0" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1c] via-black/40 to-black/10 z-0" />
             </>
           ) : (
             <>
@@ -63,7 +72,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
             </>
           )}
 
-          <Link href="/off-plan" className="absolute top-6 left-6 md:top-8 md:left-10 z-20 flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors">
+          <Link href="/off-plan" className="absolute top-28 left-6 md:top-32 md:left-12 z-20 flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors">
             <ArrowLeft className="w-4 h-4" /> All Developers
           </Link>
 
@@ -81,7 +90,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#d4af37]">Off Plan Developer</span>
               <h1 className="text-4xl md:text-7xl font-serif uppercase tracking-[0.15em] text-white mt-2">{developer.name}</h1>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 text-sm text-gray-300">
-                <span>{listings.length} {listings.length === 1 ? "Project" : "Projects"} Available</span>
+                {projects.length > 0 && <span>{projects.length} {projects.length === 1 ? "Project" : "Projects"}</span>}
                 {developer.website && (
                   <a href={developer.website} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
                     <Globe className="w-4 h-4" /> Official Website
@@ -95,40 +104,86 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
 
       {/* About */}
       {developer.description && (
-        <section className="w-full mx-auto px-6 lg:px-12 pt-8 md:pt-12">
+        <section className="w-full mx-auto px-6 lg:px-12 pt-10 md:pt-14">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-16">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-gold">About</span>
-              <h2 className="text-3xl md:text-4xl font-serif text-brand-black mt-3">About {developer.name}</h2>
+              <h2 className="text-3xl md:text-4xl font-serif text-white mt-3">About {developer.name}</h2>
             </div>
-            <p className="lg:col-span-2 text-gray-600 font-light leading-relaxed whitespace-pre-line text-base md:text-lg">
+            <p className="lg:col-span-2 text-gray-300 font-light leading-relaxed whitespace-pre-line text-base md:text-lg">
               {developer.description}
             </p>
           </div>
         </section>
       )}
 
-      {/* Projects */}
-      <section className="w-full mx-auto px-6 lg:px-12 pt-16 md:pt-20">
-        <h2 className="text-3xl md:text-4xl font-serif text-brand-black mb-8">
-          Projects by {developer.name}
-        </h2>
-        {listings.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
-            <h3 className="text-2xl font-serif text-brand-black mb-2">New Launches Coming Soon</h3>
-            <p className="text-gray-500 mb-6">Contact us for early access to upcoming {developer.name} projects.</p>
-            <Link href="/contact" className="px-6 py-3 bg-brand-gold text-white rounded-full font-medium hover:bg-brand-black transition-colors">
-              Register Interest
-            </Link>
+      {/* Projects, one after another */}
+      {projects.length > 0 && (
+        <section className="w-full pt-10 md:pt-12">
+          <div className="px-6 lg:px-12 mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-12">
+            <h2 className="text-3xl md:text-4xl font-serif text-white">
+              Projects by {developer.name}
+            </h2>
+            {/* Jump links to each project below, so the empty space beside the heading is useful */}
+            <nav aria-label={`Projects by ${developer.name}`} className="flex flex-wrap items-center gap-x-5 gap-y-2 lg:justify-end lg:pb-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">Jump to</span>
+              {projects.map((project) => (
+                <a
+                  key={project.id}
+                  href={`#${project.slug}`}
+                  className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-gold border-b border-brand-gold/40 pb-0.5 hover:text-white hover:border-white transition-colors"
+                >
+                  {project.name}
+                </a>
+              ))}
+            </nav>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {listings.map((prop, idx) => (
-              <OffPlanListingCard key={prop.id} property={prop} developer={devSummary} index={idx} />
+          <div>
+            {projects.map((project, i) => (
+              <div key={project.id} id={project.slug} className="scroll-mt-24">
+                <ProjectShowcase
+                  project={project}
+                  propertiesHref={projectHref(developer.slug, project)}
+                  propertyCount={countByProject[project.id]}
+                />
+                {i < projects.length - 1 && (
+                  // Gold double rule between projects, as on the Reportage offer pages
+                  <div className="bg-[#1c1c1c] px-6 pt-4 pb-12 md:pb-16" aria-hidden="true">
+                    <div className="max-w-3xl mx-auto">
+                      <div className="h-[5px] bg-brand-gold" />
+                      <div className="h-px bg-brand-gold mt-[5px]" />
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
+
+      {/* Properties not inside a project */}
+      {(listings.length > 0 || projects.length === 0) && (
+        <section className="w-full mx-auto px-6 lg:px-12 pt-16 md:pt-20">
+          <h2 className="text-3xl md:text-4xl font-serif text-white mb-8">
+            {projects.length > 0 ? `More properties by ${developer.name}` : `Projects by ${developer.name}`}
+          </h2>
+          {listings.length === 0 ? (
+            <div className="text-center py-16 bg-white/5 rounded-3xl border border-white/10">
+              <h3 className="text-2xl font-serif text-white mb-2">New Launches Coming Soon</h3>
+              <p className="text-gray-400 mb-6">Contact us for early access to upcoming {developer.name} projects.</p>
+              <Link href="/contact" className="px-6 py-3 bg-brand-gold text-white rounded-full font-medium hover:bg-brand-black transition-colors">
+                Register Interest
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {listings.map((prop, idx) => (
+                <OffPlanListingCard key={prop.id} property={prop} developer={devSummary} index={idx} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </main>
   );
 }

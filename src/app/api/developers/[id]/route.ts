@@ -20,12 +20,18 @@ export async function GET(
       return NextResponse.json({ success: false, error: "Developer not found" }, { status: 404 });
     }
 
-    const listings = await prisma.listing.findMany({
-      where: { developerId: developer.id, NOT: { isVisible: false } },
-      orderBy: { createdAt: "desc" },
-    });
+    const [listings, projects] = await Promise.all([
+      prisma.listing.findMany({
+        where: { developerId: developer.id, NOT: { isVisible: false } },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.offPlanProject.findMany({
+        where: { developerId: developer.id, NOT: { isVisible: false } },
+        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+      }),
+    ]);
 
-    return NextResponse.json({ success: true, data: { ...developer, listings } });
+    return NextResponse.json({ success: true, data: { ...developer, listings, projects } });
   } catch (error) {
     console.error("Error fetching developer:", error);
     return NextResponse.json({ success: false, error: "Failed to fetch developer" }, { status: 500 });
@@ -82,7 +88,8 @@ export async function DELETE(
   try {
     const { id } = await params;
     // Unlink the developer's listings so they keep working as normal off plan listings
-    await prisma.listing.updateMany({ where: { developerId: id }, data: { developerId: null } });
+    await prisma.listing.updateMany({ where: { developerId: id }, data: { developerId: null, projectId: null } });
+    await prisma.offPlanProject.deleteMany({ where: { developerId: id } });
     await prisma.developer.delete({ where: { id } });
     return NextResponse.json({ success: true, message: "Developer deleted successfully" });
   } catch (error) {

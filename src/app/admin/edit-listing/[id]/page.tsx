@@ -7,7 +7,7 @@ import { addWatermarkAndCompress } from "@/lib/imageProcessor";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { UnitDetailsFields } from "@/components/admin/UnitDetailsFields";
 import { readUnitDetails, formatAedPrice } from "@/lib/unitDetails";
-import DeveloperSelect from "@/components/admin/DeveloperSelect";
+import ProjectSelect from "@/components/admin/ProjectSelect";
 
 export default function EditListingPage() {
   const { id } = useParams();
@@ -22,6 +22,7 @@ export default function EditListingPage() {
   const [propertyType, setPropertyType] = useState("Residential");
   const [status, setStatus] = useState("FOR SALE");
   const [developerId, setDeveloperId] = useState("");
+  const [projectId, setProjectId] = useState("");
   const [category, setCategory] = useState("Apartment");
   const [overview, setOverview] = useState("");
   const [specifications, setSpecifications] = useState<{ title: string, desc: string }[]>([]);
@@ -46,6 +47,7 @@ export default function EditListingPage() {
           if (data.data.propertyType) setPropertyType(data.data.propertyType);
           if (data.data.status) setStatus(data.data.status);
           if (data.data.developerId) setDeveloperId(data.data.developerId);
+          if (data.data.projectId) setProjectId(data.data.projectId);
           if (data.data.category) setCategory(data.data.category);
           if (data.data.overview) setOverview(data.data.overview);
           
@@ -128,6 +130,10 @@ export default function EditListingPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (status === "OFF PLAN" && !projectId) {
+      alert("Please choose the developer and project for this off plan property.");
+      return;
+    }
 
     const form = e.currentTarget;
     const title = (form.elements.namedItem("title") as HTMLInputElement).value;
@@ -198,6 +204,7 @@ export default function EditListingPage() {
         price: finalPrice,
         status,
         developerId: status === "OFF PLAN" ? developerId || null : null,
+        projectId: status === "OFF PLAN" ? projectId || null : null,
         propertyType,
         category,
         city,
@@ -250,6 +257,43 @@ export default function EditListingPage() {
 
       <div className="bg-white rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 p-6 md:p-10">
         <form className="space-y-8" onSubmit={handleSubmit}>
+
+          {/* Status first: an off plan property starts by choosing its developer and project */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3 md:col-span-2">
+              <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
+                Status
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                <label className="cursor-pointer">
+                  <input type="radio" name="status" value="FOR SALE" className="peer sr-only" checked={status === "FOR SALE"} onChange={(e) => setStatus(e.target.value)} />
+                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
+                    FOR SALE
+                  </div>
+                </label>
+                <label className="cursor-pointer">
+                  <input type="radio" name="status" value="FOR RENT" className="peer sr-only" checked={status === "FOR RENT"} onChange={(e) => setStatus(e.target.value)} />
+                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
+                    FOR RENT
+                  </div>
+                </label>
+                <label className="cursor-pointer">
+                  <input type="radio" name="status" value="OFF PLAN" className="peer sr-only" checked={status === "OFF PLAN"} onChange={(e) => setStatus(e.target.value)} />
+                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
+                    OFF PLAN
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {status === "OFF PLAN" && (
+              <ProjectSelect
+                developerId={developerId}
+                projectId={projectId}
+                onChange={(v) => { setDeveloperId(v.developerId); setProjectId(v.projectId); }}
+              />
+            )}
+          </div>
           
           <div className="space-y-3">
             <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
@@ -329,35 +373,6 @@ export default function EditListingPage() {
               />
             </div>
 
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
-                Status
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                <label className="cursor-pointer">
-                  <input type="radio" name="status" value="FOR SALE" className="peer sr-only" checked={status === "FOR SALE"} onChange={(e) => setStatus(e.target.value)} />
-                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
-                    FOR SALE
-                  </div>
-                </label>
-                <label className="cursor-pointer">
-                  <input type="radio" name="status" value="FOR RENT" className="peer sr-only" checked={status === "FOR RENT"} onChange={(e) => setStatus(e.target.value)} />
-                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
-                    FOR RENT
-                  </div>
-                </label>
-                <label className="cursor-pointer">
-                  <input type="radio" name="status" value="OFF PLAN" className="peer sr-only" checked={status === "OFF PLAN"} onChange={(e) => setStatus(e.target.value)} />
-                  <div className="text-center px-4 py-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 font-bold tracking-wider transition-all peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:text-brand-gold hover:bg-gray-100">
-                    OFF PLAN
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            {status === "OFF PLAN" && (
-              <DeveloperSelect value={developerId} onChange={setDeveloperId} />
-            )}
 
             <div className="space-y-2 md:col-span-1">
               <label className="block text-sm font-semibold text-brand-black uppercase tracking-wider">
