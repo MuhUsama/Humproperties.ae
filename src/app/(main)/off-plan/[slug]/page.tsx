@@ -104,7 +104,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
 
       {/* About */}
       {developer.description && (
-        <section className="w-full mx-auto px-6 lg:px-12 pt-8 md:pt-12">
+        <section className="w-full mx-auto px-6 lg:px-12 pt-10 md:pt-14">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-16">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-gold">About</span>
@@ -119,10 +119,25 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
 
       {/* Projects, one after another */}
       {projects.length > 0 && (
-        <section className="w-full pt-16 md:pt-20">
-          <h2 className="px-6 lg:px-12 text-3xl md:text-4xl font-serif text-brand-black mb-8">
-            Projects by {developer.name}
-          </h2>
+        <section className="w-full pt-10 md:pt-12">
+          <div className="px-6 lg:px-12 mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-12">
+            <h2 className="text-3xl md:text-4xl font-serif text-brand-black">
+              Projects by {developer.name}
+            </h2>
+            {/* Jump links to each project below, so the empty space beside the heading is useful */}
+            <nav aria-label={`Projects by ${developer.name}`} className="flex flex-wrap items-center gap-x-5 gap-y-2 lg:justify-end lg:pb-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">Jump to</span>
+              {projects.map((project) => (
+                <a
+                  key={project.id}
+                  href={`#${project.slug}`}
+                  className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-gold border-b border-brand-gold/40 pb-0.5 hover:text-brand-black hover:border-brand-black transition-colors"
+                >
+                  {project.name}
+                </a>
+              ))}
+            </nav>
+          </div>
           <div>
             {projects.map((project, i) => (
               <div key={project.id} id={project.slug} className="scroll-mt-24">
