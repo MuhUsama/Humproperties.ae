@@ -54,7 +54,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
   const devSummary = { id: developer.id, name: developer.name, slug: developer.slug, logo: developer.logo };
 
   return (
-    <main className="min-h-screen bg-[#faf9f7] pb-20">
+    <main className="min-h-screen bg-[#1c1c1c] text-white pb-20">
 
       {/* Hero, full screen */}
       <section className="relative w-full">
@@ -63,7 +63,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={developer.coverImage} alt={developer.name} className="absolute inset-0 w-full h-full object-cover grayscale z-0" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 z-0" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1c] via-black/40 to-black/10 z-0" />
             </>
           ) : (
             <>
@@ -108,9 +108,9 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-16">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-gold">About</span>
-              <h2 className="text-3xl md:text-4xl font-serif text-brand-black mt-3">About {developer.name}</h2>
+              <h2 className="text-3xl md:text-4xl font-serif text-white mt-3">About {developer.name}</h2>
             </div>
-            <p className="lg:col-span-2 text-gray-600 font-light leading-relaxed whitespace-pre-line text-base md:text-lg">
+            <p className="lg:col-span-2 text-gray-300 font-light leading-relaxed whitespace-pre-line text-base md:text-lg">
               {developer.description}
             </p>
           </div>
@@ -121,7 +121,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
       {projects.length > 0 && (
         <section className="w-full pt-10 md:pt-12">
           <div className="px-6 lg:px-12 mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-12">
-            <h2 className="text-3xl md:text-4xl font-serif text-brand-black">
+            <h2 className="text-3xl md:text-4xl font-serif text-white">
               Projects by {developer.name}
             </h2>
             {/* Jump links to each project below, so the empty space beside the heading is useful */}
@@ -131,7 +131,7 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
                 <a
                   key={project.id}
                   href={`#${project.slug}`}
-                  className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-gold border-b border-brand-gold/40 pb-0.5 hover:text-brand-black hover:border-brand-black transition-colors"
+                  className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-gold border-b border-brand-gold/40 pb-0.5 hover:text-white hover:border-white transition-colors"
                 >
                   {project.name}
                 </a>
@@ -164,13 +164,13 @@ export default function DeveloperPage({ params }: { params: Promise<{ slug: stri
       {/* Properties not inside a project */}
       {(listings.length > 0 || projects.length === 0) && (
         <section className="w-full mx-auto px-6 lg:px-12 pt-16 md:pt-20">
-          <h2 className="text-3xl md:text-4xl font-serif text-brand-black mb-8">
+          <h2 className="text-3xl md:text-4xl font-serif text-white mb-8">
             {projects.length > 0 ? `More properties by ${developer.name}` : `Projects by ${developer.name}`}
           </h2>
           {listings.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
-              <h3 className="text-2xl font-serif text-brand-black mb-2">New Launches Coming Soon</h3>
-              <p className="text-gray-500 mb-6">Contact us for early access to upcoming {developer.name} projects.</p>
+            <div className="text-center py-16 bg-white/5 rounded-3xl border border-white/10">
+              <h3 className="text-2xl font-serif text-white mb-2">New Launches Coming Soon</h3>
+              <p className="text-gray-400 mb-6">Contact us for early access to upcoming {developer.name} projects.</p>
               <Link href="/contact" className="px-6 py-3 bg-brand-gold text-white rounded-full font-medium hover:bg-brand-black transition-colors">
                 Register Interest
               </Link>
