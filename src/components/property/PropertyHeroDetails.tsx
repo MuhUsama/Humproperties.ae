@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef } from "react";
-import PhotoRing from "@/components/property/PhotoRing";
+import PhotoRing, { ringSpeedLevel } from "@/components/property/PhotoRing";
 import { useSettings } from "@/context/SettingsContext";
 import { Bed, Bath, Square, MapPin, Share2, Check, ArrowLeft, Phone, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -79,7 +79,7 @@ export default function PropertyHeroDetails(p: HeroOptionProps) {
             )}
           </div>
           {useRing ? (
-            <PhotoRing images={galleryImages} activeIndex={activeIndex} onFrontChange={setActiveIndex} controlsRef={ringControls} />
+            <PhotoRing images={galleryImages} activeIndex={activeIndex} onFrontChange={setActiveIndex} controlsRef={ringControls} speed={ringSpeedLevel(siteInfo.photo_ring_speed)} />
           ) : n > 1 ? (
             <div className="flex gap-2 md:gap-3 mt-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {galleryImages.map((src, i) => (
