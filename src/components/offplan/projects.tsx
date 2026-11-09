@@ -24,10 +24,49 @@ export type OffPlanProject = {
 export const projectHref = (developerSlug: string, project: { slug: string }) => `/off-plan/${developerSlug}/${project.slug}`;
 
 // Horizontal snap slider with arrows and page dots. Items size themselves with a `basis-*` class.
-export function Slider({ children, count, label }: { children: React.ReactNode; count: number; label: string }) {
+// With `autoPlayMs`, each item gets that long in turn (the row slides to bring it into view),
+// and `onFinished` is called once the last one has had its turn.
+export function Slider({
+  children,
+  count,
+  label,
+  autoPlayMs,
+  paused = false,
+  onFinished,
+}: {
+  children: React.ReactNode;
+  count: number;
+  label: string;
+  autoPlayMs?: number;
+  paused?: boolean;
+  onFinished?: () => void;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
+  const [turn, setTurn] = useState(0);
+
+  useEffect(() => {
+    if (!autoPlayMs || paused) return;
+    const timer = window.setTimeout(() => {
+      const next = turn + 1;
+      if (next >= count) {
+        onFinished?.();
+        return;
+      }
+      setTurn(next);
+      // Bring item `next` into view if it isn't already
+      const track = trackRef.current;
+      const item = track?.children[next] as HTMLElement | undefined;
+      if (track && item) {
+        const left = item.offsetLeft - (track.children[0] as HTMLElement).offsetLeft;
+        if (left + item.offsetWidth > track.scrollLeft + track.clientWidth + 1) {
+          track.scrollTo({ left, behavior: "smooth" });
+        }
+      }
+    }, autoPlayMs);
+    return () => window.clearTimeout(timer);
+  }, [autoPlayMs, paused, turn, count, onFinished]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -94,8 +133,26 @@ export function Slider({ children, count, label }: { children: React.ReactNode; 
   );
 }
 
+// Card widths for a row of `count` cards: when there are fewer cards than fit in a row,
+// they widen to fill it, so the row never ends in an empty gap.
+function cardSizing(count: number) {
+  // A lone card on a wide screen sits photo-left, details-right instead of becoming one huge photo
+  if (count <= 1)
+    return {
+      width: "basis-full",
+      card: "lg:flex-row",
+      photo: "aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] lg:w-2/3 lg:flex-shrink-0",
+      body: "lg:p-10 lg:justify-center lg:[&>*]:mt-0",
+    };
+  if (count === 2) return { width: "basis-[85%] sm:basis-1/2", card: "", photo: "aspect-[4/3] lg:aspect-[16/9]", body: "" };
+  if (count === 3) return { width: "basis-[85%] sm:basis-1/2 lg:basis-1/3", card: "", photo: "aspect-[4/3]", body: "" };
+  return { width: "basis-[85%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4", card: "", photo: "aspect-[4/3]", body: "" };
+}
+
 // Card used in the developer rows on /off-plan. Only filled-in details are shown.
-export function ProjectCard({ project, href }: { project: OffPlanProject; href: string }) {
+// `count` is how many cards share the row (defaults to a full row of 4).
+export function ProjectCard({ project, href, count = 4 }: { project: OffPlanProject; href: string; count?: number }) {
+  const sizing = cardSizing(count);
   const tag = project.discount;
   const stats = [
     project.startingPrice && { value: project.startingPrice, label: "Starting price" },
@@ -106,10 +163,10 @@ export function ProjectCard({ project, href }: { project: OffPlanProject; href: 
   return (
     <Link
       href={href}
-      className="group flex-shrink-0 basis-[85%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4 snap-start px-2"
+      className={`group flex-shrink-0 ${sizing.width} snap-start px-2`}
     >
-      <div className="bg-white h-full flex flex-col border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-        <div className="relative aspect-[4/3] overflow-hidden bg-brand-black">
+      <div className={`bg-white h-full flex flex-col ${sizing.card} border border-gray-100 hover:shadow-xl transition-shadow duration-300`}>
+        <div className={`relative ${sizing.photo} overflow-hidden bg-brand-black`}>
           {project.coverImage && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -124,7 +181,7 @@ export function ProjectCard({ project, href }: { project: OffPlanProject; href: 
             </span>
           )}
         </div>
-        <div className="p-5 flex-1 flex flex-col gap-4">
+        <div className={`p-5 flex-1 flex flex-col gap-4 ${sizing.body}`}>
           <div>
           <h3 className="font-serif text-2xl text-brand-black leading-tight">{project.name}</h3>
           {project.location && <p className="text-xs text-gray-500 mt-1">{project.location}</p>}
