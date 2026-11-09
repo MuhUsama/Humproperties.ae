@@ -14,7 +14,7 @@ const OFF_PLAN_FAQS = getFaqsByCategory("off-plan");
 
 // How long each project gets on screen. A developer stays up until all its projects have had
 // their turn, then the next developer comes up.
-const PROJECT_MS = 3500;
+const PROJECT_MS = 2000;
 
 export default function OffPlanPage() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
