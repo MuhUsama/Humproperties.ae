@@ -9,13 +9,24 @@ type Props = {
   onFrontChange: (i: number) => void;
   /** Exposes prev/next so the main photo's arrows can turn the ring */
   controlsRef?: React.MutableRefObject<{ by: (k: number) => void } | null>;
+  /** Auto-turn speed from the admin "Photo gallery speed" setting, 0 (still) to 10 (fastest) */
+  speed?: number;
 };
 
 const unopt = (src?: string) => !!src?.startsWith("/uploads/");
 
-// Slow rotation in degrees per frame, and how long the ring rests after the visitor touches it
-const AUTO_SPEED = 0.05;
+// Auto-turn speed: the admin picks a level from 0 to 10, each level adds DEG_PER_LEVEL degrees
+// per second. The default level turns about 8x faster than the original 3 degrees a second.
+// IDLE_MS is how long the ring rests after the visitor touches it.
+export const DEFAULT_RING_SPEED = 6;
+const DEG_PER_LEVEL = 4;
 const IDLE_MS = 4000;
+
+export function ringSpeedLevel(value?: string | null) {
+  const v = Number(value);
+  if (value == null || value === "" || !Number.isFinite(v)) return DEFAULT_RING_SPEED;
+  return Math.min(10, Math.max(0, v));
+}
 
 /**
  * A small ring of photos under the main listing photo. Photos always face the
@@ -23,7 +34,7 @@ const IDLE_MS = 4000;
  * back ones float smaller near the top. It turns slowly on its own, can be
  * dragged or swiped, and whichever photo reaches the front becomes the main photo.
  */
-export default function PhotoRing({ images, activeIndex, onFrontChange, controlsRef }: Props) {
+export default function PhotoRing({ images, activeIndex, onFrontChange, controlsRef, speed = DEFAULT_RING_SPEED }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const frontRef = useRef(activeIndex);
@@ -32,6 +43,10 @@ export default function PhotoRing({ images, activeIndex, onFrontChange, controls
   useEffect(() => {
     onFrontRef.current = onFrontChange;
   }, [onFrontChange]);
+  const speedRef = useRef(speed);
+  useEffect(() => {
+    speedRef.current = speed;
+  }, [speed]);
 
   const n = images.length;
 
@@ -87,9 +102,14 @@ export default function PhotoRing({ images, activeIndex, onFrontChange, controls
       itemRefs.current.forEach((d, i) => d?.setAttribute("data-front", String(i === bi)));
     };
 
+    let last = performance.now();
     const tick = () => {
+      const now = performance.now();
+      // Seconds since the last frame, capped so a background tab doesn't jump the ring on return
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
       if (!drag) {
-        if (!reduce && visible && !document.hidden && performance.now() > idleUntil) target += AUTO_SPEED;
+        if (!reduce && visible && !document.hidden && now > idleUntil) target += speedRef.current * DEG_PER_LEVEL * dt;
         rot += (target - rot) * 0.09;
       }
       render();

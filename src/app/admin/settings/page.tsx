@@ -19,6 +19,7 @@ export default function SettingsPage() {
 
   const [settings, setSettings] = useState({
     mortgage_interest_rate: "4.5",
+    photo_ring_speed: "6",
     contact_email: "",
     contact_phone: "",
     contact_whatsapp: "",
@@ -347,6 +348,45 @@ export default function SettingsPage() {
               </div>
               <p className="text-xs text-gray-500 mt-2">
                 This rate will be locked and displayed to users on the frontend calculator.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Photo Gallery Speed */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+            <h2 className="text-lg font-bold text-brand-black">Photo Gallery Speed</h2>
+            <p className="text-gray-500 text-sm mt-1">How fast the rotating photo gallery under the main photo turns on property pages.</p>
+          </div>
+
+          <div className="p-6">
+            <div className="max-w-md">
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="photo_ring_speed" className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  Rotation Speed
+                </label>
+                <span className="text-sm font-bold text-brand-black">
+                  {Number(settings.photo_ring_speed) === 0 ? "Stopped" : `${settings.photo_ring_speed} / 10`}
+                </span>
+              </div>
+              <input
+                id="photo_ring_speed"
+                type="range"
+                min="0"
+                max="10"
+                step="1"
+                value={settings.photo_ring_speed}
+                onChange={(e) => handleChange('photo_ring_speed', e.target.value)}
+                className="w-full accent-brand-gold cursor-pointer"
+              />
+              <div className="flex justify-between text-[11px] text-gray-400 mt-1">
+                <span>Stopped</span>
+                <span>Slow</span>
+                <span>Fast</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                0 stops the automatic turning (visitors can still drag it). The default is 6.
               </p>
             </div>
           </div>
