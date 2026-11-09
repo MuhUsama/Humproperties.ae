@@ -24,10 +24,49 @@ export type OffPlanProject = {
 export const projectHref = (developerSlug: string, project: { slug: string }) => `/off-plan/${developerSlug}/${project.slug}`;
 
 // Horizontal snap slider with arrows and page dots. Items size themselves with a `basis-*` class.
-export function Slider({ children, count, label }: { children: React.ReactNode; count: number; label: string }) {
+// With `autoPlayMs`, each item gets that long in turn (the row slides to bring it into view),
+// and `onFinished` is called once the last one has had its turn.
+export function Slider({
+  children,
+  count,
+  label,
+  autoPlayMs,
+  paused = false,
+  onFinished,
+}: {
+  children: React.ReactNode;
+  count: number;
+  label: string;
+  autoPlayMs?: number;
+  paused?: boolean;
+  onFinished?: () => void;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
+  const [turn, setTurn] = useState(0);
+
+  useEffect(() => {
+    if (!autoPlayMs || paused) return;
+    const timer = window.setTimeout(() => {
+      const next = turn + 1;
+      if (next >= count) {
+        onFinished?.();
+        return;
+      }
+      setTurn(next);
+      // Bring item `next` into view if it isn't already
+      const track = trackRef.current;
+      const item = track?.children[next] as HTMLElement | undefined;
+      if (track && item) {
+        const left = item.offsetLeft - (track.children[0] as HTMLElement).offsetLeft;
+        if (left + item.offsetWidth > track.scrollLeft + track.clientWidth + 1) {
+          track.scrollTo({ left, behavior: "smooth" });
+        }
+      }
+    }, autoPlayMs);
+    return () => window.clearTimeout(timer);
+  }, [autoPlayMs, paused, turn, count, onFinished]);
 
   useEffect(() => {
     const track = trackRef.current;

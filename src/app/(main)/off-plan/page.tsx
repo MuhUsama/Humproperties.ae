@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { OffPlanDeveloper } from "@/components/offplan/OffPlanListingCard";
@@ -12,8 +12,9 @@ type Developer = OffPlanDeveloper & { coverImage?: string | null };
 
 const OFF_PLAN_FAQS = getFaqsByCategory("off-plan");
 
-// How long each developer's projects stay on screen before the next developer comes up
-const ROTATE_MS = 5000;
+// How long each project gets on screen. A developer stays up until all its projects have had
+// their turn, then the next developer comes up.
+const PROJECT_MS = 3500;
 
 export default function OffPlanPage() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
@@ -48,17 +49,22 @@ export default function OffPlanPage() {
   const activeDev = developers.find((d) => d.id === activeId) || withProjects[0] || null;
   const activeProjects = activeDev ? projects.filter((p) => p.developerId === activeDev.id) : [];
 
-  // Move on to the next developer with projects every few seconds, looping back to the first
+  // After the last project of a developer, move on to the next developer with projects, looping
+  const nextDeveloper = useCallback(() => {
+    setActiveId((current) => {
+      const i = withProjects.findIndex((d) => d.id === (current ?? withProjects[0]?.id));
+      return withProjects.length ? withProjects[(i + 1) % withProjects.length].id : current;
+    });
+    setTimerKey((k) => k + 1);
+  }, [withProjects]);
+
+  // A clicked developer with no projects has nothing to step through, so move on after one turn
+  const activeIsEmpty = !!activeDev && activeProjects.length === 0;
   useEffect(() => {
-    if (paused || withProjects.length < 2) return;
-    const timer = window.setInterval(() => {
-      setActiveId((current) => {
-        const i = withProjects.findIndex((d) => d.id === current);
-        return withProjects[(Math.max(i, 0) + 1) % withProjects.length].id;
-      });
-    }, ROTATE_MS);
-    return () => window.clearInterval(timer);
-  }, [paused, withProjects, timerKey]);
+    if (!activeIsEmpty || paused) return;
+    const timer = window.setTimeout(nextDeveloper, PROJECT_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeIsEmpty, paused, nextDeveloper, timerKey]);
 
   // Clicking a developer shows its projects here (on this page) and restarts the timer
   const selectDeveloper = (dev: Developer) => {
@@ -106,7 +112,7 @@ export default function OffPlanPage() {
             <p className="text-gray-500">Contact us for early access to upcoming off plan projects.</p>
           </div>
         ) : (
-          <div key={activeDev.id} className="animate-fadeInUp">
+          <div key={`${activeDev.id}-${timerKey}`} className="animate-fadeInUp">
             <div className="flex items-end justify-between gap-4 mb-6">
               <h2 className="font-serif text-2xl md:text-3xl uppercase tracking-[0.12em] text-brand-black">
                 {activeDev.name} Projects
@@ -119,7 +125,13 @@ export default function OffPlanPage() {
               </Link>
             </div>
             {activeProjects.length > 0 ? (
-              <Slider count={activeProjects.length} label={`${activeDev.name} projects`}>
+              <Slider
+                count={activeProjects.length}
+                label={`${activeDev.name} projects`}
+                autoPlayMs={PROJECT_MS}
+                paused={paused}
+                onFinished={nextDeveloper}
+              >
                 {activeProjects.map((project) => (
                   <ProjectCard
                     key={project.id}
