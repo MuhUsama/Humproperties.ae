@@ -12,6 +12,9 @@ type Developer = OffPlanDeveloper & { coverImage?: string | null };
 
 const OFF_PLAN_FAQS = getFaqsByCategory("off-plan");
 
+// How long each developer's projects stay on screen before the next developer comes up
+const ROTATE_MS = 5000;
+
 export default function OffPlanPage() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [projects, setProjects] = useState<OffPlanProject[]>([]);
@@ -30,14 +33,42 @@ export default function OffPlanPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // One row per developer that has projects, in the developers' order
-  const rows = useMemo(
-    () =>
-      developers
-        .map((dev) => ({ dev, projects: projects.filter((p) => p.developerId === dev.id) }))
-        .filter((row) => row.projects.length > 0),
+  // Developers that have projects. These are the ones the slider rotates through.
+  const withProjects = useMemo(
+    () => developers.filter((dev) => projects.some((p) => p.developerId === dev.id)),
     [developers, projects]
   );
+
+  // The developer whose projects are shown under the slider
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [paused, setPaused] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
+  const projectsRef = useRef<HTMLElement>(null);
+
+  const activeDev = developers.find((d) => d.id === activeId) || withProjects[0] || null;
+  const activeProjects = activeDev ? projects.filter((p) => p.developerId === activeDev.id) : [];
+
+  // Move on to the next developer with projects every few seconds, looping back to the first
+  useEffect(() => {
+    if (paused || withProjects.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveId((current) => {
+        const i = withProjects.findIndex((d) => d.id === current);
+        return withProjects[(Math.max(i, 0) + 1) % withProjects.length].id;
+      });
+    }, ROTATE_MS);
+    return () => window.clearInterval(timer);
+  }, [paused, withProjects, timerKey]);
+
+  // Clicking a developer shows its projects here (on this page) and restarts the timer
+  const selectDeveloper = (dev: Developer) => {
+    setActiveId(dev.id);
+    setTimerKey((k) => k + 1);
+    const section = projectsRef.current;
+    if (section && section.getBoundingClientRect().top > window.innerHeight * 0.6) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#faf9f7] pt-32 md:pt-36">
@@ -48,43 +79,62 @@ export default function OffPlanPage() {
           <h1 className="text-center font-serif text-2xl md:text-4xl uppercase tracking-[0.25em] text-brand-black mb-8 md:mb-10">
             Off-Plan Developers
           </h1>
-          <DeveloperCarousel developers={developers} />
+          <DeveloperCarousel developers={developers} activeId={activeDev?.id ?? null} onSelect={selectDeveloper} />
         </section>
       )}
 
-      {/* Each developer's projects */}
-      <section id="projects" className="w-full mx-auto px-6 lg:px-12 pt-10 md:pt-16 pb-6 scroll-mt-24">
+      {/* The selected developer's projects */}
+      <section
+        ref={projectsRef}
+        id="projects"
+        className="w-full mx-auto px-6 lg:px-12 pt-10 md:pt-16 pb-6 scroll-mt-24"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+        onTouchEnd={() => {
+          setPaused(false);
+          setTimerKey((k) => k + 1);
+        }}
+      >
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="w-12 h-12 border-4 border-brand-gold border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : rows.length === 0 ? (
+        ) : !activeDev ? (
           <div className="text-center py-16 bg-white border border-gray-100">
             <h3 className="text-2xl font-serif text-brand-black mb-2">New Launches Coming Soon</h3>
             <p className="text-gray-500">Contact us for early access to upcoming off plan projects.</p>
           </div>
         ) : (
-          <div className="space-y-14 md:space-y-20">
-            {rows.map(({ dev, projects: devProjects }) => (
-              <div key={dev.id}>
-                <div className="flex items-end justify-between gap-4 mb-6">
-                  <h2 className="font-serif text-2xl md:text-3xl uppercase tracking-[0.12em] text-brand-black">
-                    {dev.name} Projects
-                  </h2>
-                  <Link
-                    href={`/off-plan/${dev.slug}`}
-                    className="flex-shrink-0 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-black border-b border-brand-black pb-0.5 hover:text-brand-gold hover:border-brand-gold transition-colors"
-                  >
-                    View all<span className="hidden sm:inline"> {dev.name}</span>
-                  </Link>
-                </div>
-                <Slider count={devProjects.length} label={`${dev.name} projects`}>
-                  {devProjects.map((project) => (
-                    <ProjectCard key={project.id} project={project} href={projectHref(dev.slug, project)} />
-                  ))}
-                </Slider>
+          <div key={activeDev.id} className="animate-fadeInUp">
+            <div className="flex items-end justify-between gap-4 mb-6">
+              <h2 className="font-serif text-2xl md:text-3xl uppercase tracking-[0.12em] text-brand-black">
+                {activeDev.name} Projects
+              </h2>
+              <Link
+                href={`/off-plan/${activeDev.slug}`}
+                className="flex-shrink-0 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-black border-b border-brand-black pb-0.5 hover:text-brand-gold hover:border-brand-gold transition-colors"
+              >
+                View all<span className="hidden sm:inline"> {activeDev.name}</span>
+              </Link>
+            </div>
+            {activeProjects.length > 0 ? (
+              <Slider count={activeProjects.length} label={`${activeDev.name} projects`}>
+                {activeProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    count={activeProjects.length}
+                    href={projectHref(activeDev.slug, project)}
+                  />
+                ))}
+              </Slider>
+            ) : (
+              <div className="text-center py-16 bg-white border border-gray-100">
+                <h3 className="text-2xl font-serif text-brand-black mb-2">New {activeDev.name} Launches Coming Soon</h3>
+                <p className="text-gray-500">Contact us for early access to upcoming {activeDev.name} projects.</p>
               </div>
-            ))}
+            )}
           </div>
         )}
       </section>
@@ -124,7 +174,15 @@ export default function OffPlanPage() {
   );
 }
 
-function DeveloperCarousel({ developers }: { developers: Developer[] }) {
+function DeveloperCarousel({
+  developers,
+  activeId,
+  onSelect,
+}: {
+  developers: Developer[];
+  activeId: string | null;
+  onSelect: (dev: Developer) => void;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
@@ -152,6 +210,20 @@ function DeveloperCarousel({ developers }: { developers: Developer[] }) {
     track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
   };
 
+  // Slide the row along so the active developer is always in view
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !activeId) return;
+    const card = track.querySelector<HTMLElement>(`[data-dev-id="${activeId}"]`);
+    if (!card) return;
+    const left = card.offsetLeft - track.offsetLeft;
+    const right = left + card.offsetWidth;
+    if (left < track.scrollLeft || right > track.scrollLeft + track.clientWidth + 1) {
+      const pageIndex = Math.floor(left / track.clientWidth);
+      track.scrollTo({ left: Math.min(pageIndex * track.clientWidth, left), behavior: "smooth" });
+    }
+  }, [activeId]);
+
   return (
     <div className="relative">
       <div
@@ -159,11 +231,14 @@ function DeveloperCarousel({ developers }: { developers: Developer[] }) {
         className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-1.5"
       >
         {developers.map((dev) => (
-          <Link
+          <button
+            type="button"
             key={dev.id}
-            href={`/off-plan/${dev.slug}`}
-            className="group relative flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/5 snap-start px-1.5"
-            aria-label={dev.name}
+            data-dev-id={dev.id}
+            onClick={() => onSelect(dev)}
+            aria-label={`Show ${dev.name} projects`}
+            aria-pressed={dev.id === activeId}
+            className="group relative flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/5 snap-start px-1.5 text-left"
           >
             <div className="relative aspect-square overflow-hidden bg-brand-black">
               {dev.coverImage && (
@@ -174,13 +249,23 @@ function DeveloperCarousel({ developers }: { developers: Developer[] }) {
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               )}
-              <div className="absolute inset-0 bg-black/70 group-hover:bg-black/60 transition-colors duration-500" />
+              <div
+                className={`absolute inset-0 transition-colors duration-500 ${
+                  dev.id === activeId ? "bg-black/50" : "bg-black/70 group-hover:bg-black/60"
+                }`}
+              />
               <div className="absolute inset-0 flex items-center justify-center p-6 md:p-8">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={dev.logo} alt={dev.name} className="max-w-full max-h-[45%] object-contain brightness-0 invert" />
               </div>
+              {/* Gold bar under the developer whose projects are showing */}
+              <span
+                className={`absolute left-0 bottom-0 h-1 w-full bg-brand-gold origin-left transition-transform duration-500 ${
+                  dev.id === activeId ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
             </div>
-          </Link>
+          </button>
         ))}
       </div>
 
