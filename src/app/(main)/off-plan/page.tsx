@@ -77,12 +77,12 @@ export default function OffPlanPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#faf9f7] pt-32 md:pt-36">
+    <main className="min-h-screen bg-[#faf9f7] pt-24 md:pt-36">
 
       {/* Developers carousel */}
       {!loading && developers.length > 0 && (
-        <section className="w-full mx-auto px-6 lg:px-12 pt-4 md:pt-8">
-          <h1 className="text-center font-serif text-2xl md:text-4xl uppercase tracking-[0.25em] text-brand-black mb-8 md:mb-10">
+        <section className="w-full mx-auto px-6 lg:px-12 pt-2 md:pt-8">
+          <h1 className="text-center font-serif text-xl md:text-4xl uppercase tracking-[0.2em] md:tracking-[0.25em] text-brand-black mb-4 md:mb-10">
             Off-Plan Developers
           </h1>
           <DeveloperCarousel developers={developers} activeId={activeDev?.id ?? null} onSelect={selectDeveloper} />
@@ -93,7 +93,7 @@ export default function OffPlanPage() {
       <section
         ref={projectsRef}
         id="projects"
-        className="w-full mx-auto px-6 lg:px-12 pt-10 md:pt-16 pb-6 scroll-mt-24"
+        className="w-full mx-auto px-6 lg:px-12 pt-6 md:pt-16 pb-6 scroll-mt-24"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onTouchStart={() => setPaused(true)}
@@ -113,8 +113,8 @@ export default function OffPlanPage() {
           </div>
         ) : (
           <div key={`${activeDev.id}-${timerKey}`} className="animate-fadeInUp">
-            <div className="flex items-end justify-between gap-4 mb-6">
-              <h2 className="font-serif text-2xl md:text-3xl uppercase tracking-[0.12em] text-brand-black">
+            <div className="flex items-end justify-between gap-4 mb-3 md:mb-6">
+              <h2 className="font-serif text-xl md:text-3xl uppercase tracking-[0.12em] text-brand-black">
                 {activeDev.name} Projects
               </h2>
               <Link
@@ -231,8 +231,11 @@ function DeveloperCarousel({
     const left = card.offsetLeft - track.offsetLeft;
     const right = left + card.offsetWidth;
     if (left < track.scrollLeft || right > track.scrollLeft + track.clientWidth + 1) {
-      const pageIndex = Math.floor(left / track.clientWidth);
-      track.scrollTo({ left: Math.min(pageIndex * track.clientWidth, left), behavior: "smooth" });
+      // Go to the page the card starts on; if the card would still be cut off at the right edge
+      // (on phones a page holds about 2.5 tiles), bring the card itself to the left edge instead.
+      let target = Math.floor(left / track.clientWidth) * track.clientWidth;
+      if (right > target + track.clientWidth + 1) target = left;
+      track.scrollTo({ left: Math.min(target, track.scrollWidth - track.clientWidth), behavior: "smooth" });
     }
   }, [activeId]);
 
@@ -240,7 +243,7 @@ function DeveloperCarousel({
     <div className="relative">
       <div
         ref={trackRef}
-        className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-1.5"
+        className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-1 sm:-mx-1.5"
       >
         {developers.map((dev) => (
           <button
@@ -250,9 +253,9 @@ function DeveloperCarousel({
             onClick={() => onSelect(dev)}
             aria-label={`Show ${dev.name} projects`}
             aria-pressed={dev.id === activeId}
-            className="group relative flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/5 snap-start px-1.5 text-left"
+            className="group relative flex-shrink-0 basis-[38%] sm:basis-1/3 lg:basis-1/5 snap-start px-1 sm:px-1.5 text-left"
           >
-            <div className="relative aspect-square overflow-hidden bg-brand-black">
+            <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-brand-black">
               {dev.coverImage && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -266,7 +269,7 @@ function DeveloperCarousel({
                   dev.id === activeId ? "bg-black/50" : "bg-black/70 group-hover:bg-black/60"
                 }`}
               />
-              <div className="absolute inset-0 flex items-center justify-center p-6 md:p-8">
+              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={dev.logo} alt={dev.name} className="max-w-full max-h-[45%] object-contain brightness-0 invert" />
               </div>
@@ -299,7 +302,7 @@ function DeveloperCarousel({
           >
             <ChevronRight className="w-5 h-5" />
           </button>
-          <div className="flex justify-center gap-2 mt-6">
+          <div className="flex justify-center gap-2 mt-3 md:mt-6">
             {Array.from({ length: pageCount }).map((_, i) => (
               <button
                 key={i}
