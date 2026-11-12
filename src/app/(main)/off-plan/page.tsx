@@ -231,8 +231,11 @@ function DeveloperCarousel({
     const left = card.offsetLeft - track.offsetLeft;
     const right = left + card.offsetWidth;
     if (left < track.scrollLeft || right > track.scrollLeft + track.clientWidth + 1) {
-      const pageIndex = Math.floor(left / track.clientWidth);
-      track.scrollTo({ left: Math.min(pageIndex * track.clientWidth, left), behavior: "smooth" });
+      // Go to the page the card starts on; if the card would still be cut off at the right edge
+      // (on phones a page holds about 2.5 tiles), bring the card itself to the left edge instead.
+      let target = Math.floor(left / track.clientWidth) * track.clientWidth;
+      if (right > target + track.clientWidth + 1) target = left;
+      track.scrollTo({ left: Math.min(target, track.scrollWidth - track.clientWidth), behavior: "smooth" });
     }
   }, [activeId]);
 
