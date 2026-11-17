@@ -153,13 +153,9 @@ function cardSizing(count: number) {
 // `count` is how many cards share the row (defaults to a full row of 4).
 export function ProjectCard({ project, href, count = 4 }: { project: OffPlanProject; href: string; count?: number }) {
   const sizing = cardSizing(count);
-  // On desktop the photo takes whatever height is left under the developer row, so the whole
-  // card (photo, name, figures) fits on one screen without scrolling.
-  // A lone card has its details beside the photo, so its photo also gets the height of the details.
-  const fitPhoto =
-    count <= 1
-      ? "lg:aspect-auto lg:h-[max(160px,calc(100svh-345px-clamp(110px,40svh-130px,240px)))]"
-      : "lg:aspect-auto lg:h-[max(100px,calc(100svh-475px-clamp(110px,40svh-130px,240px)))]";
+  // On desktop the photo height comes from the page (--photo-h), which measures the space left
+  // under the developer row so the whole card (photo, name, figures) ends at the bottom of the screen.
+  const fitPhoto = "lg:aspect-auto lg:h-[var(--photo-h,320px)]";
   const tag = project.discount;
   const stats = [
     project.startingPrice && { value: project.startingPrice, label: "Starting price" },
@@ -173,7 +169,7 @@ export function ProjectCard({ project, href, count = 4 }: { project: OffPlanProj
       className={`group flex-shrink-0 ${sizing.width} snap-start px-2`}
     >
       <div className={`bg-white h-full flex flex-col ${sizing.card} border border-gray-100 hover:shadow-xl transition-shadow duration-300`}>
-        <div className={`relative ${sizing.photo} ${fitPhoto} overflow-hidden bg-brand-black`}>
+        <div data-card-photo className={`relative ${sizing.photo} ${fitPhoto} overflow-hidden bg-brand-black`}>
           {project.coverImage && (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { OffPlanDeveloper } from "@/components/offplan/OffPlanListingCard";
@@ -49,6 +49,27 @@ export default function OffPlanPage() {
   const activeDev = developers.find((d) => d.id === activeId) || withProjects[0] || null;
   const activeProjects = activeDev ? projects.filter((p) => p.developerId === activeDev.id) : [];
 
+  // Desktop: size the project photos so the cards end at the bottom of the screen, under the
+  // developer row. Measured from the real layout, so it fits any screen height with no gap.
+  const [photoHeight, setPhotoHeight] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const section = projectsRef.current;
+      const photo = section?.querySelector<HTMLElement>("[data-card-photo]");
+      const card = photo?.parentElement;
+      if (!section || !photo || !card || window.innerWidth < 1024) return setPhotoHeight(null);
+      const cardTop = card.getBoundingClientRect().top + window.scrollY;
+      // A lone card has its details beside the photo, so only the photo sets its height
+      const sideBySide = getComputedStyle(card).flexDirection === "row";
+      const rest = sideBySide ? 0 : card.offsetHeight - photo.offsetHeight;
+      setPhotoHeight(Math.max(sideBySide ? 220 : 160, Math.round(window.innerHeight - 24 - cardTop - rest)));
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    document.fonts?.ready.then(measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [activeDev?.id, activeProjects.length, timerKey, loading, developers.length]);
+
   // After the last project of a developer, move on to the next developer with projects, looping
   const nextDeveloper = useCallback(() => {
     setActiveId((current) => {
@@ -94,6 +115,7 @@ export default function OffPlanPage() {
         ref={projectsRef}
         id="projects"
         className="w-full mx-auto px-6 lg:px-12 pt-6 md:pt-16 lg:pt-4 pb-6 scroll-mt-24"
+        style={photoHeight ? ({ "--photo-h": `${photoHeight}px` } as React.CSSProperties) : undefined}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         // Only pause/resume here. Don't bump timerKey on touch: it is part of the `key` below, so it
@@ -244,6 +266,8 @@ function DeveloperCarousel({
       <div
         ref={trackRef}
         className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-1 sm:-mx-1.5"
+        // Desktop shows up to 7 developers in a row; with fewer, the tiles widen to fill the row
+        style={{ "--dev-cols": Math.min(7, developers.length) } as React.CSSProperties}
       >
         {developers.map((dev) => (
           <button
@@ -253,10 +277,10 @@ function DeveloperCarousel({
             onClick={() => onSelect(dev)}
             aria-label={`Show ${dev.name} projects`}
             aria-pressed={dev.id === activeId}
-            className="group relative flex-shrink-0 basis-[38%] sm:basis-1/3 lg:basis-1/5 snap-start px-1 sm:px-1.5 text-left"
+            className="group relative flex-shrink-0 basis-[38%] sm:basis-1/3 lg:basis-[calc(100%/var(--dev-cols))] snap-start px-1 sm:px-1.5 text-left"
           >
-            {/* On desktop the tile height follows the screen height, so the projects below fit on one screen */}
-            <div className="relative aspect-[4/3] sm:aspect-square lg:aspect-auto lg:h-[clamp(110px,40svh-130px,240px)] overflow-hidden bg-brand-black">
+            {/* On desktop the tiles are short so the projects below get most of the screen */}
+            <div className="relative aspect-[4/3] sm:aspect-square lg:aspect-auto lg:h-[clamp(96px,14svh,140px)] overflow-hidden bg-brand-black">
               {dev.coverImage && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -270,7 +294,7 @@ function DeveloperCarousel({
                   dev.id === activeId ? "bg-black/50" : "bg-black/70 group-hover:bg-black/60"
                 }`}
               />
-              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8">
+              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={dev.logo} alt={dev.name} className="max-w-full max-h-[45%] object-contain brightness-0 invert" />
               </div>
