@@ -153,6 +153,9 @@ function cardSizing(count: number) {
 // `count` is how many cards share the row (defaults to a full row of 4).
 export function ProjectCard({ project, href, count = 4 }: { project: OffPlanProject; href: string; count?: number }) {
   const sizing = cardSizing(count);
+  // On desktop the photo height comes from the page (--photo-h), which measures the space left
+  // under the developer row so the whole card (photo, name, figures) ends at the bottom of the screen.
+  const fitPhoto = "lg:aspect-auto lg:h-[var(--photo-h,320px)]";
   const tag = project.discount;
   const stats = [
     project.startingPrice && { value: project.startingPrice, label: "Starting price" },
@@ -166,7 +169,7 @@ export function ProjectCard({ project, href, count = 4 }: { project: OffPlanProj
       className={`group flex-shrink-0 ${sizing.width} snap-start px-2`}
     >
       <div className={`bg-white h-full flex flex-col ${sizing.card} border border-gray-100 hover:shadow-xl transition-shadow duration-300`}>
-        <div className={`relative ${sizing.photo} overflow-hidden bg-brand-black`}>
+        <div data-card-photo className={`relative ${sizing.photo} ${fitPhoto} overflow-hidden bg-brand-black`}>
           {project.coverImage && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -181,13 +184,13 @@ export function ProjectCard({ project, href, count = 4 }: { project: OffPlanProj
             </span>
           )}
         </div>
-        <div className={`p-5 flex-1 flex flex-col gap-4 ${sizing.body}`}>
+        <div className={`p-5 lg:p-4 flex-1 flex flex-col gap-4 lg:gap-2 ${sizing.body}`}>
           <div>
           <h3 className="font-serif text-2xl text-brand-black leading-tight">{project.name}</h3>
           {project.location && <p className="text-xs text-gray-500 mt-1">{project.location}</p>}
           </div>
           {stats.length > 0 && (
-            <div className="flex justify-between gap-4 mt-auto pt-4 border-t border-gray-100">
+            <div className="flex justify-between gap-4 mt-auto pt-4 lg:pt-3 border-t border-gray-100">
               {stats.slice(0, 2).map((s, i) => (
                 <div key={s.label} className={i === 1 ? "text-right" : ""}>
                   <div className="text-sm font-semibold text-brand-black">{s.value}</div>
