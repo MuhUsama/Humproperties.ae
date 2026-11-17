@@ -96,11 +96,11 @@ export default function OffPlanPage() {
         className="w-full mx-auto px-6 lg:px-12 pt-6 md:pt-16 pb-6 scroll-mt-24"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
+        // Only pause/resume here. Don't bump timerKey on touch: it is part of the `key` below, so it
+        // would rebuild the cards and "View all" link the moment the finger lifts, before the
+        // browser delivers the tap, and the tap would land on nothing.
         onTouchStart={() => setPaused(true)}
-        onTouchEnd={() => {
-          setPaused(false);
-          setTimerKey((k) => k + 1);
-        }}
+        onTouchEnd={() => setPaused(false)}
       >
         {loading ? (
           <div className="flex justify-center items-center py-20">
